@@ -63,12 +63,8 @@ public class TestFactory {
         var board = loadBoard(boardText);
         var testPiece = board.getPiece(startPosition);
         var validMoves = loadMoves(startPosition, endPositions);
-        validateMoves(board, testPiece, startPosition, validMoves);
-    }
 
-    static public void validateMoves(ChessBoard board, ChessPiece testPiece, ChessPosition startPosition, Set<ChessMove> validMoves) {
-        var pieceMoves = new HashSet<>(testPiece.pieceMoves(board, startPosition));
-        Assertions.assertEquals(validMoves, pieceMoves, "Wrong moves");
+        Assertions.assertEquals(validMoves, testPiece.pieceMoves(board, startPosition), "Wrong moves");
     }
 
     final static Map<Character, ChessPiece.PieceType> charToTypeMap = Map.of(
