@@ -3,63 +3,66 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMovesCalculator implements PieceMovesCalculator {
+public class KingMovesCalculator implements PieceMovesCalculator {
     private final ChessBoard board;
     private final ChessPosition myPosition;
 
-    public KnightMovesCalculator(ChessBoard board, ChessPosition myPosition) {
+    public KingMovesCalculator(ChessBoard board, ChessPosition myPosition) {
         this.board = board;
         this.myPosition = myPosition;
     }
 
+    /**
+     * Note: similar to the Knight implementation (just checking 8 spaces)
+     */
     public Collection<ChessMove> pieceMoves() {
         ArrayList<ChessMove> moveList = new ArrayList<ChessMove>();
         ChessPosition positionToCheck;
 
-        // 1. Position (row + 2, col + 1)
-        positionToCheck = new ChessPosition((myPosition.getRow() + 2), (myPosition.getColumn() + 1));
+        // Right
+        positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() + 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 2. Position (row + 1, col + 2)
-        positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() + 2));
+        // Upper Right
+        positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() + 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 3. Position (row - 1, col + 2)
-        positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() + 2));
+        // Upper
+        positionToCheck = new ChessPosition((myPosition.getRow() + 1), myPosition.getColumn());
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 4. Position (row - 2, col + 1)
-        positionToCheck = new ChessPosition((myPosition.getRow() - 2), (myPosition.getColumn() + 1));
+        // Upper Left
+        positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() - 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 5. Position (row - 2, row - 1)
-        positionToCheck = new ChessPosition((myPosition.getRow() - 2), (myPosition.getColumn() - 1));
+        // Left
+        positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() - 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 6. Position (row - 1, col - 2)
-        positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() - 2));
+        // Lower Left
+        positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() - 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 7. Position (row + 1, col - 2)
-        positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() - 2));
+        // Lower
+        positionToCheck = new ChessPosition((myPosition.getRow() - 1), myPosition.getColumn());
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
-        // 8. Position (row + 2, col - 1)
-        positionToCheck = new ChessPosition((myPosition.getRow() + 2), (myPosition.getColumn() - 1));
+        // Lower Right
+        positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() + 1));
         if (checkToAddMove(positionToCheck)) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
