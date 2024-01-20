@@ -71,6 +71,8 @@ public class ChessPiece {
                 possibleMoves = knightCalculator.pieceMoves();
                 break;
             case ROOK:
+                RookMovesCalculator rookCalculator = new RookMovesCalculator(board, myPosition);
+                possibleMoves = rookCalculator.pieceMoves();
                 break;
             case PAWN:
                 break;
