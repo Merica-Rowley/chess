@@ -65,8 +65,8 @@ public class ChessPiece {
             case BISHOP:
                 break;
             case KNIGHT:
-                KnightMovesCalculator calculator = new KnightMovesCalculator();
-                possibleMoves = calculator.pieceMoves(board, myPosition);
+                KnightMovesCalculator calculator = new KnightMovesCalculator(board, myPosition);
+                possibleMoves = calculator.pieceMoves();
                 break;
             case ROOK:
                 break;
