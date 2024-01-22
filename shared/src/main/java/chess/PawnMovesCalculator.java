@@ -13,8 +13,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         this.myPosition = myPosition;
         this.color = color;
     }
+
     public Collection<ChessMove> pieceMoves() {
-        ArrayList<ChessMove> moveList = new ArrayList<>();
+        ArrayList<ChessMove> moveList = new ArrayList<ChessMove>();
         ChessPosition positionToCheck;
         boolean startingPosition = false;
         boolean promotion = false;
@@ -147,7 +148,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 }
                 break;
         }
-
         return moveList;
     }
 
