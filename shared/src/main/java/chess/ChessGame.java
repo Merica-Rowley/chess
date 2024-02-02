@@ -85,7 +85,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-
+        ChessPosition kingPosition = getKingPosition(teamColor);
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                if (!(board.getPiece(currentPosition) == null)){
+                    ChessPiece currentPiece = board.getPiece(currentPosition);
+                    if (currentPiece.getTeamColor() != teamColor){
+                        Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, currentPosition);
+                        for (ChessMove move : possibleMoves) {
+                            if (move.getEndPosition().equals(kingPosition)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -96,10 +112,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
-            return legalMoves.isEmpty();
-        }
+//        if (isInCheck(teamColor)) {
+//            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
+//            return legalMoves.isEmpty();
+//        }
         return false;
     }
 
@@ -111,10 +127,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
-            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
-            return legalMoves.isEmpty();
-        }
+//        if (!isInCheck(teamColor)) {
+//            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
+//            return legalMoves.isEmpty();
+//        }
         return false;
     }
 
@@ -140,12 +156,15 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition positionToCheck = new ChessPosition(i, j);
-                if ((board.getPiece(positionToCheck).getPieceType() == ChessPiece.PieceType.KING)
-                     && (board.getPiece(positionToCheck).getTeamColor() == teamColor)) {
-                    return positionToCheck;
+                if (!(board.getPiece(positionToCheck) == null)){
+                    if ((board.getPiece(positionToCheck).getPieceType() == ChessPiece.PieceType.KING)
+                            && (board.getPiece(positionToCheck).getTeamColor() == teamColor)) {
+                        return positionToCheck;
+                    }
                 }
             }
         }
+        throw new RuntimeException("No king found");
     }
 
 }
