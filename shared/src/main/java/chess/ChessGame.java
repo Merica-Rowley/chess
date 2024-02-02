@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -9,7 +10,6 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-
     private TeamColor teamTurn;
     private ChessBoard board;
 
@@ -60,7 +60,22 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
+        if (!legalMoves.contains(move)) {
+            throw new InvalidMoveException("Illegal move: your king is in danger");
+        }
+
+        if (move.getPromotionPiece() == null) {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.removePiece(move.getStartPosition());
+        }
+        // else clause only executes in the case of a pawn promotion
+        else {
+            board.addPiece(move.getEndPosition(),
+                           new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
+                                          move.getPromotionPiece()));
+            board.removePiece(move.getStartPosition());
+        }
     }
 
     /**
