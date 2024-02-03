@@ -78,6 +78,41 @@ public class ChessGame {
         }
     }
 
+    public boolean testMove(ChessMove move) {
+        if (move.getPromotionPiece() == null) {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.removePiece(move.getStartPosition());
+        }
+        // else clause only executes in the case of a pawn promotion
+        else {
+            board.addPiece(move.getEndPosition(),
+                    new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
+                            move.getPromotionPiece()));
+            board.removePiece(move.getStartPosition());
+        }
+
+        if (isInCheck(this.getTeamTurn())) {
+            undoMove(move);
+            return false;
+        }
+        else {
+            undoMove(move);
+            return true;
+        }
+    }
+
+    public void undoMove(ChessMove move) {
+        ChessMove backwardsMove = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
+        if (move.getPromotionPiece() != null) { // In other words, the pawn was promoted, so we need to demote it
+            board.addPiece(backwardsMove.getEndPosition(), new ChessPiece(board.getPiece(backwardsMove.getStartPosition()).getTeamColor(), ChessPiece.PieceType.PAWN));
+            board.removePiece(backwardsMove.getStartPosition());
+        }
+        else {
+            board.addPiece(backwardsMove.getEndPosition(), board.getPiece(backwardsMove.getStartPosition()));
+            board.removePiece(backwardsMove.getStartPosition());
+        }
+    }
+
     /**
      * Determines if the given team is in check
      *
