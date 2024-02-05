@@ -60,14 +60,14 @@ public class ChessGame {
      * Gets a list of all possible moves for the team whose turn it is
      * @return ArrayList of ChessMove that contains a team's possible moves
      */
-    public Collection<ChessMove> allValidMoves() {
+    public Collection<ChessMove> allValidMoves(TeamColor color) {
         Collection<ChessMove> allValidMoves = new ArrayList<ChessMove>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 if (board.getPiece(new ChessPosition(i, j)) == null) {
                     continue;
                 }
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamTurn){
+                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == color){
                     Collection<ChessMove> validPieceMoves = validMoves(new ChessPosition(i, j));
                     allValidMoves.addAll(validPieceMoves);
                 }
@@ -199,7 +199,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return (isInCheck(teamColor) && (allValidMoves().isEmpty()));
+        return (isInCheck(teamColor) && (allValidMoves(teamColor).isEmpty()));
     }
 
     /**
@@ -210,7 +210,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return (!isInCheck(teamColor) && (allValidMoves().isEmpty()));
+        return allValidMoves(teamColor).isEmpty();
     }
 
     /**
