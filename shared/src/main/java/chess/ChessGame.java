@@ -50,7 +50,34 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
+        for (ChessMove move: validMoves) {
+            if (!testMove(move)) {
+                validMoves.remove(move);
+            }
+        }
+        return validMoves;
+    }
+
+    /**
+     * Gets a list of all possible moves for the team whose turn it is
+     * @return ArrayList of ChessMove that contains a team's possible moves
+     */
+    public Collection<ChessMove> allValidMoves() {
+        Collection<ChessMove> allValidMoves = new ArrayList<ChessMove>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (board.getPiece(new ChessPosition(i, j)) == null) {
+                    continue;
+                }
+                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamTurn){
+                    Collection<ChessMove> validPieceMoves = validMoves(new ChessPosition(i, j));
+                    allValidMoves.addAll(validPieceMoves);
+                }
+            }
+        }
+        return allValidMoves;
     }
 
     /**
@@ -76,9 +103,24 @@ public class ChessGame {
                                           move.getPromotionPiece()));
             board.removePiece(move.getStartPosition());
         }
+
+        // Switching whose turn it is
+        if (this.teamTurn == TeamColor.BLACK) {
+            this.teamTurn = TeamColor.WHITE;
+        }
+        else {
+            this.teamTurn = TeamColor.BLACK;
+        }
     }
 
+    /**
+     * Makes a move on the board, tests if the move is legal (king is not in check), then undoes the move, regardless of legality
+     * @param move the move to test
+     * @return True if move is legal (does not leave king in check)
+     */
     public boolean testMove(ChessMove move) {
+        ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+
         if (move.getPromotionPiece() == null) {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.removePiece(move.getStartPosition());
@@ -93,14 +135,25 @@ public class ChessGame {
 
         if (isInCheck(this.getTeamTurn())) {
             undoMove(move);
+            if (capturedPiece != null) {
+                board.addPiece(move.getEndPosition(), capturedPiece);
+            }
             return false;
         }
         else {
             undoMove(move);
+            if (capturedPiece != null) {
+                board.addPiece(move.getEndPosition(), capturedPiece);
+            }
             return true;
         }
     }
 
+
+    /**
+     * Takes in a move and moves the piece from the end position to the start position (reverses the move)
+     * @param move the move to be reversed
+     */
     public void undoMove(ChessMove move) {
         ChessMove backwardsMove = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
         if (move.getPromotionPiece() != null) { // In other words, the pawn was promoted, so we need to demote it
@@ -121,6 +174,9 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = getKingPosition(teamColor);
+        if (kingPosition == null) {
+            return false;
+        }
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
@@ -147,11 +203,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-//        if (isInCheck(teamColor)) {
-//            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
-//            return legalMoves.isEmpty();
-//        }
-        return false;
+        return (isInCheck(teamColor) && (allValidMoves().isEmpty()));
     }
 
     /**
@@ -162,11 +214,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-//        if (!isInCheck(teamColor)) {
-//            Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
-//            return legalMoves.isEmpty();
-//        }
-        return false;
+        return (!isInCheck(teamColor) && (allValidMoves().isEmpty()));
     }
 
     /**
@@ -199,7 +247,7 @@ public class ChessGame {
                 }
             }
         }
-        throw new RuntimeException("No king found");
+//        throw new RuntimeException("No king found");
+        return null;
     }
-
 }
