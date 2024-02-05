@@ -85,7 +85,10 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
         if (!legalMoves.contains(move)) {
-            throw new InvalidMoveException("Illegal move: your king is in danger");
+            throw new InvalidMoveException("Illegal move");
+        }
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Wrong team's turn");
         }
 
         if (move.getPromotionPiece() == null) {
