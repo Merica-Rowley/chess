@@ -52,11 +52,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
-        for (ChessMove move: validMoves) {
-            if (!testMove(move)) {
-                validMoves.remove(move);
-            }
-        }
+        validMoves.removeIf(move -> !testMove(move));
         return validMoves;
     }
 
