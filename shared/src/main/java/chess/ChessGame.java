@@ -119,6 +119,7 @@ public class ChessGame {
      */
     public boolean testMove(ChessMove move) {
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+        TeamColor pieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
 
         if (move.getPromotionPiece() == null) {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
@@ -126,13 +127,11 @@ public class ChessGame {
         }
         // else clause only executes in the case of a pawn promotion
         else {
-            board.addPiece(move.getEndPosition(),
-                    new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),
-                            move.getPromotionPiece()));
+            board.addPiece(move.getEndPosition(), new ChessPiece(pieceColor, move.getPromotionPiece()));
             board.removePiece(move.getStartPosition());
         }
 
-        if (isInCheck(this.getTeamTurn())) {
+        if (isInCheck(pieceColor)) {
             undoMove(move);
             if (capturedPiece != null) {
                 board.addPiece(move.getEndPosition(), capturedPiece);
