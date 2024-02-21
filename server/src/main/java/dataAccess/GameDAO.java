@@ -11,11 +11,10 @@ public interface GameDAO {
     void insertGame(GameData game) throws DataAccessException;
 
     // read
-    int getGameID() throws DataAccessException;
-    String getWhiteUsername() throws DataAccessException;
-    String getBlackUsername() throws DataAccessException;
-    String getGameName() throws DataAccessException;
-    ChessGame getGame() throws DataAccessException;
+    String getWhiteUsername(int gameID) throws DataAccessException;
+    String getBlackUsername(int gameID) throws DataAccessException;
+    String getGameName(int gameID) throws DataAccessException;
+    ChessGame getGame(int gameID) throws DataAccessException;
     ArrayList<GameData> listGames() throws DataAccessException;
 
     // update

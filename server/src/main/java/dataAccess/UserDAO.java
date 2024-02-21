@@ -9,10 +9,11 @@ public interface UserDAO {
     void insertUser(UserData user) throws DataAccessException;
 
     // read
-    String getUser(String email) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException;
     String getPassword(String username) throws DataAccessException;
     // update
 
     // delete
-    void deleteUser() throws DataAccessException;
+    void deleteUser(String username) throws DataAccessException;
+    void deleteAllUsers() throws DataAccessException;
 }
