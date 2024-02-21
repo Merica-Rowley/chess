@@ -11,6 +11,7 @@ public interface UserDAO {
     // read
     UserData getUser(String username) throws DataAccessException;
     String getPassword(String username) throws DataAccessException;
+
     // update
 
     // delete
