@@ -7,7 +7,7 @@ import model.UserData;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
-    HashMap<String, UserData> storage = new HashMap<String, UserData>();
+    public HashMap<String, UserData> storage = new HashMap<String, UserData>();
 
     public void insertUser(UserData user) throws DataAccessException {
         storage.put(user.username(), user);
