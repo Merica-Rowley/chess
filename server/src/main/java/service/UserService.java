@@ -4,6 +4,7 @@ import dataAccess.*;
 import model.AuthData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,6 +30,10 @@ public class UserService {
         AuthData authData = this.createAuth(username);
         authDAO.insertAuthData(authData);
         return authData;
+    }
+
+    public void logoutUser(String authToken) throws DataAccessException{
+        authDAO.deleteAuthData(authToken);
     }
     
     private AuthData createAuth(String username) {

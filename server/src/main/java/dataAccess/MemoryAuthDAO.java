@@ -18,12 +18,12 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuthData(String authToken) throws DataAccessException {
-        if (!storage.containsKey(authToken)) throw new DataAccessException("Error: No user found with authToken");
+        if (!storage.containsKey(authToken)) throw new NotLoggedInException("Error: authToken not found; user not logged in");
         return storage.get(authToken);
     }
 
     public void deleteAuthData(String authToken) throws DataAccessException {
-        if (!storage.containsKey(authToken)) throw new DataAccessException("Error: No user found with authToken");
+        if (!storage.containsKey(authToken)) throw new NotLoggedInException("Error: authToken not found; user not logged in");
         storage.remove(authToken);
     }
 

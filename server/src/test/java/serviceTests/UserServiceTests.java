@@ -7,10 +7,12 @@ import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.UserService;
+import spark.utils.Assert;
 
 public class UserServiceTests {
 
     @Test
+    // Positive Test
     void register() throws DataAccessException {
         UserDAO testUserDAO = new MemoryUserDAO();
         AuthDAO testAuthDAO = new MemoryAuthDAO();
@@ -31,6 +33,7 @@ public class UserServiceTests {
 ;    }
 
     @Test
+    // Negative Test
     void registerUserAlreadyExists() throws DataAccessException {
         UserDAO testUserDAO = new MemoryUserDAO();
         AuthDAO testAuthDAO = new MemoryAuthDAO();
@@ -45,6 +48,7 @@ public class UserServiceTests {
     }
 
     @Test
+    // Positive Test
     void login() throws DataAccessException {
         UserDAO testUserDAO = new MemoryUserDAO();
         AuthDAO testAuthDAO = new MemoryAuthDAO();
@@ -61,6 +65,7 @@ public class UserServiceTests {
     }
 
     @Test
+    // Negative Test
     void loginIncorrectPassword() throws DataAccessException {
         UserDAO testUserDAO = new MemoryUserDAO();
         AuthDAO testAuthDAO = new MemoryAuthDAO();
@@ -69,5 +74,34 @@ public class UserServiceTests {
         UserService service = new UserService(testUserDAO, testAuthDAO);
 
         Assertions.assertThrows(IncorrectPasswordException.class, () -> service.loginUser("user21", "notthepassword"));
+    }
+
+    @Test
+    // Positive Test
+    void logout() throws DataAccessException {
+        UserDAO testUserDAO = new MemoryUserDAO();
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+
+        testUserDAO.insertUser(new UserData("someUser", "pass", "hello@mail.com"));
+        UserService service = new UserService(testUserDAO, testAuthDAO);
+
+        try {
+            AuthData authData = service.loginUser("someUser", "pass");
+            Assertions.assertEquals(1, testAuthDAO.size()); // make sure someUser's login registers to the AuthDAO
+            service.logoutUser(authData.authToken());
+            Assertions.assertEquals(0, testAuthDAO.size()); // make sure someUser's authData was removed
+        } catch (IncorrectPasswordException ignored) {
+        }
+    }
+
+    @Test
+    // Negative Test
+    void logoutAttemptedWithoutLogin() throws DataAccessException {
+        UserDAO testUserDAO = new MemoryUserDAO();
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+
+        UserService service = new UserService(testUserDAO, testAuthDAO);
+
+        Assertions.assertThrows(NotLoggedInException.class, () -> service.logoutUser("somestringthatrepresentsanauthtoken"));
     }
 }
