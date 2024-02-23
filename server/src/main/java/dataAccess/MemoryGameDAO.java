@@ -9,6 +9,12 @@ import java.util.HashMap;
 public class MemoryGameDAO implements GameDAO {
     HashMap<Integer, GameData> storage = new HashMap<Integer, GameData>();
 
+    private int nextID = 0;
+
+    public int getNextID() {
+        return ++nextID;
+    }
+
     public int size() {
         return storage.size();
     }
