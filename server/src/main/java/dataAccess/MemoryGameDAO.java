@@ -9,6 +9,10 @@ import java.util.HashMap;
 public class MemoryGameDAO implements GameDAO {
     HashMap<Integer, GameData> storage = new HashMap<Integer, GameData>();
 
+    public int size() {
+        return storage.size();
+    }
+
     public void insertGame(GameData game) throws DataAccessException {
         if (storage.containsKey(game.gameID())) throw new DataAccessException("Error: gameID already associated with a game");
         storage.put(game.gameID(), game);

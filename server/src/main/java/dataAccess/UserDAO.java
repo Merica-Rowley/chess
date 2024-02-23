@@ -5,16 +5,17 @@ import model.UserData;
 import javax.xml.crypto.Data;
 
 public interface UserDAO {
+    public int size();
+
     // create
-    void insertUser(UserData user) throws DataAccessException;
+    public void insertUser(UserData user) throws DataAccessException, UserAlreadyExistsException;
 
     // read
-    UserData getUser(String username) throws DataAccessException;
-    String getPassword(String username) throws DataAccessException;
+    public UserData getUser(String username) throws DataAccessException;
 
     // update
 
     // delete
-    void deleteUser(String username) throws DataAccessException;
-    void deleteAllUsers() throws DataAccessException;
+    public void deleteUser(String username) throws DataAccessException;
+    public void deleteAllUsers() throws DataAccessException;
 }
