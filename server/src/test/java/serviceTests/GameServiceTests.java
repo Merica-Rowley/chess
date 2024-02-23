@@ -44,4 +44,70 @@ public class GameServiceTests {
 
         Assertions.assertThrows(NotLoggedInException.class, () -> service.listGames("another-fake-auth-token"));
     }
+
+    @Test
+    // Positive Test
+    void createGame() throws DataAccessException {
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+        GameDAO testGameDAO = new MemoryGameDAO();
+
+        GameService service = new GameService(testAuthDAO, testGameDAO);
+
+        testAuthDAO.insertAuthData(new AuthData("a-made-up-auth-token", "username"));
+
+        int generatedGameID = service.createGame("a-made-up-auth-token", "NameOfTheGame");
+
+        Assertions.assertEquals("NameOfTheGame", testGameDAO.getGameData(generatedGameID).gameName());
+    }
+
+    @Test
+    // Negative Test
+    void createGameWithoutAuthentication() {
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+        GameDAO testGameDAO = new MemoryGameDAO();
+
+        GameService service = new GameService(testAuthDAO, testGameDAO);
+
+        Assertions.assertThrows(NotLoggedInException.class, () -> service.createGame("auth-token-place-holder", "MyGame"));
+    }
+
+    @Test
+    // Positive Test
+    void joinGame() throws DataAccessException {
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+        GameDAO testGameDAO = new MemoryGameDAO();
+
+        GameService service = new GameService(testAuthDAO, testGameDAO);
+        String testAuth = "test-auth-token";
+        String testUser = "fakeuser";
+        testAuthDAO.insertAuthData(new AuthData(testAuth, testUser));
+        int gameID = service.createGame(testAuth, "gamename");
+
+        service.joinGame(testAuth, ChessGame.TeamColor.BLACK, gameID);
+
+        Assertions.assertEquals(testUser, testGameDAO.getGameData(gameID).blackUsername());
+        Assertions.assertNull(testGameDAO.getGameData(gameID).whiteUsername());
+    }
+
+    @Test
+    // Negative Test
+    void joinGameTeamAlreadyTaken() throws DataAccessException {
+        AuthDAO testAuthDAO = new MemoryAuthDAO();
+        GameDAO testGameDAO = new MemoryGameDAO();
+
+        GameService service = new GameService(testAuthDAO, testGameDAO);
+
+        String testAuth = "first-test-auth-token";
+        String testUser = "ghostuser";
+        testAuthDAO.insertAuthData(new AuthData(testAuth, testUser));
+        String testAuth2 = "another-test-auth-token";
+        String testUser2 = "imaginaryuser";
+        testAuthDAO.insertAuthData(new AuthData(testAuth2, testUser2));
+
+        int gameID = service.createGame(testAuth, "othergamename");
+
+        service.joinGame(testAuth, ChessGame.TeamColor.BLACK, gameID);
+
+        Assertions.assertThrows(TeamTakenException.class, () -> service.joinGame(testAuth2, ChessGame.TeamColor.BLACK,gameID));
+    }
 }

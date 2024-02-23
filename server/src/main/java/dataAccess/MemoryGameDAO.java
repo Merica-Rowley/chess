@@ -24,24 +24,9 @@ public class MemoryGameDAO implements GameDAO {
         storage.put(game.gameID(), game);
     }
 
-    public String getWhiteUsername(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        return storage.get(gameID).whiteUsername();
-    }
-
-    public String getBlackUsername(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        return storage.get(gameID).blackUsername();
-    }
-
-    public String getGameName(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        return storage.get(gameID).gameName();
-    }
-
-    public ChessGame getGame(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        return storage.get(gameID).game();
+    public GameData getGameData(int gameID) throws DataAccessException {
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
+        return storage.get(gameID);
     }
 
     public ArrayList<GameData> listGames() throws DataAccessException {
@@ -50,37 +35,37 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public void setWhiteUsername(int gameID, String whiteUsername) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        if (storage.get(gameID).whiteUsername() != null) throw new DataAccessException("Error: white is already taken");
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
+        if (storage.get(gameID).whiteUsername() != null) throw new TeamTakenException("Error: white is already taken");
         GameData gameToUpdate = storage.get(gameID);
         GameData updatedGame = new GameData(gameID, whiteUsername, gameToUpdate.blackUsername(), gameToUpdate.gameName(), gameToUpdate.game());
         storage.put(gameID, updatedGame);
     }
 
     public void setBlackUsername(int gameID, String blackUsername) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
-        if (storage.get(gameID).blackUsername() != null) throw new DataAccessException("Error: black is already taken");
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
+        if (storage.get(gameID).blackUsername() != null) throw new TeamTakenException("Error: black is already taken");
         GameData gameToUpdate = storage.get(gameID);
         GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), blackUsername, gameToUpdate.gameName(), gameToUpdate.game());
         storage.put(gameID, updatedGame);
     }
 
     public void setGameName(int gameID, String gameName) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
         GameData gameToUpdate = storage.get(gameID);
         GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), gameToUpdate.blackUsername(), gameName, gameToUpdate.game());
         storage.put(gameID, updatedGame);
     }
 
     public void updateChessGame(int gameID, ChessGame game) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
         GameData gameToUpdate = storage.get(gameID);
         GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), gameToUpdate.blackUsername(), gameToUpdate.gameName(), game);
         storage.put(gameID, updatedGame);
     }
 
     public void deleteGame(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new DataAccessException("Error: No game found with gameID");
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
         storage.remove(gameID);
     }
 

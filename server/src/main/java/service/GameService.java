@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import dataAccess.NotLoggedInException;
+import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -29,5 +29,21 @@ public class GameService {
         int gameID = gameDAO.getNextID();
         gameDAO.insertGame(new GameData(gameID, null, null, gameName, new ChessGame()));
         return gameID;
+    }
+
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
+        AuthData authData = authDAO.getAuthData(authToken); // throws NotLoggedInException if user is not logged in
+        String username = authData.username();
+        switch(playerColor) {
+            case WHITE:
+                gameDAO.setWhiteUsername(gameID, username);
+                break;
+            case BLACK:
+                gameDAO.setBlackUsername(gameID, username);
+                break;
+            default:
+                // playerColor was not specified; user will be set as observer
+                break;
+        }
     }
 }

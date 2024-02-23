@@ -14,10 +14,7 @@ public interface GameDAO {
     public void insertGame(GameData game) throws DataAccessException;
 
     // read
-    public String getWhiteUsername(int gameID) throws DataAccessException;
-    public String getBlackUsername(int gameID) throws DataAccessException;
-    public String getGameName(int gameID) throws DataAccessException;
-    public ChessGame getGame(int gameID) throws DataAccessException;
+    public GameData getGameData(int gameID) throws DataAccessException;
     public ArrayList<GameData> listGames() throws DataAccessException;
 
     // update
