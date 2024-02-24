@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import dataAccess.MissingInformationException;
 import model.AuthData;
 import model.GameData;
 
@@ -25,6 +26,7 @@ public class GameService {
     }
 
     public int createGame(String authToken, String gameName) throws DataAccessException {
+        if (gameName == null) throw new MissingInformationException("Error: no game name");
         authDAO.getAuthData(authToken); // throws NotLoggedInException if user is not logged in
         int gameID = gameDAO.getNextID();
         gameDAO.insertGame(new GameData(gameID, null, null, gameName, new ChessGame()));
