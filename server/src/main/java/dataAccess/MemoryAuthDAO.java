@@ -1,7 +1,8 @@
 package dataAccess;
 
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NotLoggedInException;
 import model.AuthData;
-import model.GameData;
 
 import java.util.HashMap;
 

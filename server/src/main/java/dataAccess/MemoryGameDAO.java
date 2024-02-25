@@ -1,6 +1,9 @@
 package dataAccess;
 
 import chess.ChessGame;
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NoGameFoundException;
+import dataAccess.Exceptions.TeamTakenException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -47,25 +50,6 @@ public class MemoryGameDAO implements GameDAO {
         GameData gameToUpdate = storage.get(gameID);
         GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), blackUsername, gameToUpdate.gameName(), gameToUpdate.game());
         storage.put(gameID, updatedGame);
-    }
-
-    public void setGameName(int gameID, String gameName) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
-        GameData gameToUpdate = storage.get(gameID);
-        GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), gameToUpdate.blackUsername(), gameName, gameToUpdate.game());
-        storage.put(gameID, updatedGame);
-    }
-
-    public void updateChessGame(int gameID, ChessGame game) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
-        GameData gameToUpdate = storage.get(gameID);
-        GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), gameToUpdate.blackUsername(), gameToUpdate.gameName(), game);
-        storage.put(gameID, updatedGame);
-    }
-
-    public void deleteGame(int gameID) throws DataAccessException {
-        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
-        storage.remove(gameID);
     }
 
     public void deleteAllGames() {

@@ -1,4 +1,4 @@
-package dataAccess;
+package dataAccess.Exceptions;
 
 public class TeamTakenException extends DataAccessException {
     public TeamTakenException(String message) {

@@ -1,13 +1,15 @@
 package serviceTests;
 
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.IncorrectPasswordException;
+import dataAccess.Exceptions.NotLoggedInException;
+import dataAccess.Exceptions.UserAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.UserService;
-import spark.utils.Assert;
 
 public class UserServiceTests {
 
@@ -96,7 +98,7 @@ public class UserServiceTests {
 
     @Test
     // Negative Test
-    void logoutAttemptedWithoutLogin() throws DataAccessException {
+    void logoutAttemptedWithoutLogin() {
         UserDAO testUserDAO = new MemoryUserDAO();
         AuthDAO testAuthDAO = new MemoryAuthDAO();
 

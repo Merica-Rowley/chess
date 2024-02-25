@@ -2,14 +2,13 @@ package service;
 
 import chess.ChessGame;
 import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
+import dataAccess.Exceptions.DataAccessException;
 import dataAccess.GameDAO;
-import dataAccess.MissingInformationException;
+import dataAccess.Exceptions.MissingInformationException;
 import model.AuthData;
 import model.GameData;
 import model.GameListData;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 

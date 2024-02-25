@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
 
 public interface AuthDAO {
@@ -10,8 +11,6 @@ public interface AuthDAO {
 
     // read
     public AuthData getAuthData(String authToken) throws DataAccessException;
-
-    // update
 
     // delete
     public void deleteAuthData(String authToken) throws DataAccessException;

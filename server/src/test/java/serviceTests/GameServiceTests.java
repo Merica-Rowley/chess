@@ -2,8 +2,12 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NotLoggedInException;
+import dataAccess.Exceptions.TeamTakenException;
 import model.AuthData;
 import model.GameData;
+import model.GameListData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.GameService;
@@ -20,16 +24,13 @@ public class GameServiceTests {
 
         GameService service = new GameService(testAuthDAO, testGameDAO);
 
-        ChessGame chessGame1 = new ChessGame();
-        ChessGame chessGame2 = new ChessGame();
-
-        testGameDAO.insertGame(new GameData(1, "white", "black", "mygame", chessGame1));
-        testGameDAO.insertGame(new GameData(2, "white", null, "myothergame", chessGame2));
+        testGameDAO.insertGame(new GameData(1, "white", "black", "mygame", new ChessGame()));
+        testGameDAO.insertGame(new GameData(2, "white", null, "myothergame", new ChessGame()));
         testAuthDAO.insertAuthData(new AuthData("fake-auth-token", "user123"));
 
-        ArrayList<GameData> expected = new ArrayList<GameData>();
-        expected.add(new GameData(1, "white", "black", "mygame", chessGame1));
-        expected.add(new GameData(2, "white", null, "myothergame", chessGame2));
+        ArrayList<GameListData> expected = new ArrayList<GameListData>();
+        expected.add(new GameListData(1, "white", "black", "mygame"));
+        expected.add(new GameListData(2, "white", null, "myothergame"));
 
         Assertions.assertEquals(expected, service.listGames("fake-auth-token"));
     }

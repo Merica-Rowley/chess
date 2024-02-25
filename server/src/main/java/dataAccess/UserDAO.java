@@ -1,8 +1,8 @@
 package dataAccess;
 
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.UserAlreadyExistsException;
 import model.UserData;
-
-import javax.xml.crypto.Data;
 
 public interface UserDAO {
     public int size();
@@ -13,9 +13,6 @@ public interface UserDAO {
     // read
     public UserData getUser(String username) throws DataAccessException;
 
-    // update
-
     // delete
-    public void deleteUser(String username) throws DataAccessException;
     public void deleteAllUsers() throws DataAccessException;
 }

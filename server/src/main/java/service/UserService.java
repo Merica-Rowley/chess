@@ -1,10 +1,11 @@
 package service;
 
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.IncorrectPasswordException;
 import model.AuthData;
 import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,5 +41,4 @@ public class UserService {
         String authToken = UUID.randomUUID().toString();
         return new AuthData(authToken, username);
     }
-
 }

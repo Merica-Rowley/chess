@@ -1,4 +1,4 @@
-package dataAccess;
+package dataAccess.Exceptions;
 
 public class IncorrectPasswordException extends Exception {
     public IncorrectPasswordException(String message) {
