@@ -27,8 +27,7 @@ public class MemoryAuthDAO implements AuthDAO {
         storage.remove(authToken);
     }
 
-    public void deleteAllAuthData() throws DataAccessException {
-        if (storage.isEmpty()) throw new DataAccessException("Error: No AuthData to delete");
+    public void deleteAllAuthData() {
         storage.clear();
     }
 }

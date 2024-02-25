@@ -10,7 +10,6 @@ import spark.Request;
 import spark.Response;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class Handler {
     private final AuthDAO authDAO = new MemoryAuthDAO();
@@ -62,7 +61,7 @@ public class Handler {
             AuthData authData = service.loginUser(loginRequest.username(), loginRequest.password());
             response.status(200);
             return gson.toJson(authData);
-        } catch (IncorrectPasswordException e) {
+        } catch (IncorrectPasswordException | UserNotFoundException e) {
             response.status(401);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         } catch (DataAccessException e) {
@@ -75,7 +74,7 @@ public class Handler {
         UserService service = new UserService(userDAO, authDAO);
         Gson gson = new Gson();
 
-        String authToken = gson.fromJson(request.headers("authorization"), String.class);
+        String authToken = request.headers("authorization");
 
         try {
             service.logoutUser(authToken);
@@ -94,12 +93,12 @@ public class Handler {
         GameService service = new GameService(authDAO, gameDAO);
         Gson gson = new Gson();
 
-        String authToken = gson.fromJson(request.headers("authorization"), String.class);
+        String authToken = request.headers("authorization");
 
         try {
-            ArrayList<GameData> games = service.listGames(authToken);
+            ArrayList<GameListData> games = service.listGames(authToken);
             response.status(200);
-            return gson.toJson(games);
+            return gson.toJson(new ResponseGameList(games));
         } catch (NotLoggedInException e) {
             response.status(401);
             return gson.toJson(new ResponseMessage(e.getMessage()));
@@ -113,11 +112,11 @@ public class Handler {
         GameService service = new GameService(authDAO, gameDAO);
         Gson gson = new Gson();
 
-        String authToken = gson.fromJson(request.headers("authorization"), String.class);
-        String gameName = gson.fromJson(request.body(), String.class);
+        String authToken = request.headers("authorization");
+        CreateGameRequest gameRequest = gson.fromJson(request.body(), CreateGameRequest.class);
 
         try {
-            int gameID = service.createGame(authToken, gameName);
+            int gameID = service.createGame(authToken, gameRequest.gameName());
             response.status(200);
             return gson.toJson(new ResponseMessageNumber(gameID));
         } catch (MissingInformationException e) {
@@ -136,11 +135,11 @@ public class Handler {
         GameService service = new GameService(authDAO, gameDAO);
         Gson gson = new Gson();
 
-        String authToken = gson.fromJson(request.headers("authorization"), String.class);
+        String authToken = request.headers("authorization");
         JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
 
         try {
-            service.joinGame(authToken,joinGameRequest.playerColor(), joinGameRequest.gameID());
+            service.joinGame(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
             response.status(200);
             return "";
         } catch (NoGameFoundException e) {

@@ -27,8 +27,7 @@ public class MemoryUserDAO implements UserDAO {
         storage.remove(username);
     }
 
-    public void deleteAllUsers() throws DataAccessException {
-        if (storage.isEmpty()) throw new DataAccessException("Error: No users to delete");
+    public void deleteAllUsers() {
         storage.clear();
     }
 }

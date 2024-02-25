@@ -29,8 +29,7 @@ public class MemoryGameDAO implements GameDAO {
         return storage.get(gameID);
     }
 
-    public ArrayList<GameData> listGames() throws DataAccessException {
-        if (storage.isEmpty()) throw new DataAccessException("Error: No games in memory");
+    public ArrayList<GameData> listGames() {
         return new ArrayList<GameData>(storage.values());
     }
 
@@ -69,8 +68,7 @@ public class MemoryGameDAO implements GameDAO {
         storage.remove(gameID);
     }
 
-    public void deleteAllGames() throws DataAccessException {
-        if (storage.isEmpty()) throw new DataAccessException("Error: No games to delete");
+    public void deleteAllGames() {
         storage.clear();
     }
 }
