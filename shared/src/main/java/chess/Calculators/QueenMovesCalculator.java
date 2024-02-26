@@ -41,133 +41,78 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
 
             if (arm1){
                 positionToCheck = new ChessPosition((myPosition.getRow() + rowInc), (myPosition.getColumn() + colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm1 = false;
-                    } else {
-                        arm1 = false;
-                    }
-                } else {
-                    arm1 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm1 = setArmBool(positionToCheck);
             }
 
             if (arm2){
                 positionToCheck = new ChessPosition((myPosition.getRow() + rowInc), (myPosition.getColumn() - colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm2 = false;
-                    } else {
-                        arm2 = false;
-                    }
-                } else {
-                    arm2 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm2 = setArmBool(positionToCheck);
             }
 
             if (arm3){
                 positionToCheck = new ChessPosition((myPosition.getRow() - rowInc), (myPosition.getColumn() - colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm3 = false;
-                    } else {
-                        arm3 = false;
-                    }
-                } else {
-                    arm3 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm3 = setArmBool(positionToCheck);
             }
 
             if (arm4){
                 positionToCheck = new ChessPosition((myPosition.getRow() - rowInc), (myPosition.getColumn() + colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm4 = false;
-                    } else {
-                        arm4 = false;
-                    }
-                } else {
-                    arm4 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm4 = setArmBool(positionToCheck);
             }
 
             if (arm5){
                 positionToCheck = new ChessPosition((myPosition.getRow() + rowInc), myPosition.getColumn());
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm5 = false;
-                    } else {
-                        arm5 = false;
-                    }
-                } else {
-                    arm5 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm5 = setArmBool(positionToCheck);
             }
 
             if (arm6){
                 positionToCheck = new ChessPosition((myPosition.getRow() - rowInc), myPosition.getColumn());
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm6 = false;
-                    } else {
-                        arm6 = false;
-                    }
-                } else {
-                    arm6 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm6 = setArmBool(positionToCheck);
             }
 
             if (arm7){
                 positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() + colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm7 = false;
-                    } else {
-                        arm7 = false;
-                    }
-                } else {
-                    arm7 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm7 = setArmBool(positionToCheck);
             }
 
             if (arm8){
                 positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() - colInc));
-                if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm8 = false;
-                    } else {
-                        arm8 = false;
-                    }
-                } else {
-                    arm8 = false;
+                if (checkPositionOnBoard(positionToCheck)){
+                    moveList = addMoves(positionToCheck, moveList);
                 }
+                arm8 = setArmBool(positionToCheck);
             }
         }
 
+        return moveList;
+    }
+
+    public boolean setArmBool(ChessPosition positionToCheck) {
+        return checkPositionOnBoard(positionToCheck) && checkUnoccupation(positionToCheck);
+    }
+
+    public ArrayList<ChessMove> addMoves(ChessPosition positionToAdd, ArrayList<ChessMove> moveList) {
+        if (checkUnoccupation(positionToAdd) || checkEnemyOccupation(positionToAdd)) moveList.add(new ChessMove(myPosition, positionToAdd, null));
         return moveList;
     }
 

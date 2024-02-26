@@ -94,10 +94,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         if (checkPositionOnBoard(positionToCheck)) {
             if (checkUnoccupation(positionToCheck)) {
                 if (promotion) {
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
+                    moveList = addPromotionMoves(positionToCheck, moveList);
                 } else {
                     moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
@@ -116,16 +113,21 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             if (!checkUnoccupation(positionToCheck)) {
                 if (checkEnemyOccupation(positionToCheck)) {
                     if (promotion) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
+                        moveList = addPromotionMoves(positionToCheck, moveList);
                     } else {
                         moveList.add(new ChessMove(myPosition, positionToCheck, null));
                     }
                 }
             }
         }
+        return moveList;
+    }
+
+    public ArrayList<ChessMove> addPromotionMoves(ChessPosition positionToCheck, ArrayList<ChessMove> moveList) {
+        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
+        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
+        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
+        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
         return moveList;
     }
 
