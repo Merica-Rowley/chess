@@ -33,72 +33,36 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
 
     public Collection<ChessMove> pieceMovesWhite(ArrayList<ChessMove> moveList, boolean startingPosition, boolean promotion) {
         ChessPosition positionToCheck;
+        ChessPosition secondPositionToCheck;
+
         if (myPosition.getRow() == 2) {
             startingPosition = true;
         }
         else if (myPosition.getRow() == 7) {
             promotion = true;
         }
-        // Check moves
-        // 1 space ahead
+        // Check Moves
+        // Normal
         positionToCheck = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
-        if (checkPositionOnBoard(positionToCheck)) {
-            if (checkUnoccupation(positionToCheck)) {
-                if (promotion) {
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                    moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
-                }
-                else {
-                    moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                }
-            }
-        }
-        // 2 spaces ahead (only for starting position)
-        positionToCheck = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
         if (startingPosition) {
-            if (checkUnoccupation(positionToCheck)) {
-                moveList.add(new ChessMove(myPosition, positionToCheck, null));
-            }
+            secondPositionToCheck = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
         }
+        else {
+            secondPositionToCheck = null;
+        }
+        moveList = addMovesNormal(positionToCheck, moveList, secondPositionToCheck, promotion);
         // Diagonal right
         positionToCheck = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
-        if (checkPositionOnBoard(positionToCheck)) {
-            if (!checkUnoccupation(positionToCheck)){
-                if (checkEnemyOccupation(positionToCheck)) {
-                    if (promotion) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
-                    } else {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    }
-                }
-            }
-        }
+        moveList = addMovesEnemy(positionToCheck, moveList, promotion);
         // Diagonal left
         positionToCheck = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
-        if (checkPositionOnBoard(positionToCheck)) {
-            if (!checkUnoccupation(positionToCheck)){
-                if (checkEnemyOccupation(positionToCheck)) {
-                    if (promotion) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
-                    } else {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    }
-                }
-            }
-        }
+        moveList = addMovesEnemy(positionToCheck, moveList, promotion);
         return moveList;
     }
 
     public Collection<ChessMove> pieceMovesBlack(ArrayList<ChessMove> moveList, boolean startingPosition, boolean promotion) {
         ChessPosition positionToCheck;
+        ChessPosition secondPositionToCheck;
 
         if (myPosition.getRow() == 7) {
             startingPosition = true;
@@ -107,8 +71,26 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             promotion = true;
         }
         // Check moves
-        // 1 space ahead
+        // Normal
         positionToCheck = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
+        if (startingPosition) {
+            secondPositionToCheck = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
+        }
+        else {
+            secondPositionToCheck = null;
+        }
+        moveList = addMovesNormal(positionToCheck, moveList, secondPositionToCheck, promotion);
+        // Diagonal right
+        positionToCheck = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+        moveList = addMovesEnemy(positionToCheck, moveList, promotion);
+        // Diagonal left
+        positionToCheck = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+        moveList = addMovesEnemy(positionToCheck, moveList, promotion);
+
+        return moveList;
+    }
+
+    public ArrayList<ChessMove> addMovesNormal(ChessPosition positionToCheck, ArrayList<ChessMove> moveList, ChessPosition secondPositionToCheck, boolean promotion) {
         if (checkPositionOnBoard(positionToCheck)) {
             if (checkUnoccupation(positionToCheck)) {
                 if (promotion) {
@@ -116,37 +98,20 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                     moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
                     moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
                     moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
-                }
-                else {
+                } else {
                     moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
-                // Check 2 spaces ahead (for starting position only)
-                positionToCheck = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
-                if (startingPosition) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
+                if (secondPositionToCheck != null) {
+                    if (checkUnoccupation(secondPositionToCheck)) {
+                        moveList.add(new ChessMove(myPosition, secondPositionToCheck, null));
                     }
                 }
             }
         }
-        // Diagonal right
-        positionToCheck = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
-        if (checkPositionOnBoard(positionToCheck)) {
-            if (!checkUnoccupation(positionToCheck)) {
-                if (checkEnemyOccupation(positionToCheck)) {
-                    if (promotion) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.KNIGHT));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.ROOK));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.QUEEN));
-                        moveList.add(new ChessMove(myPosition, positionToCheck, ChessPiece.PieceType.BISHOP));
-                    } else {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    }
-                }
-            }
-        }
-        // Diagonal left
-        positionToCheck = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+        return moveList;
+    }
+
+    public ArrayList<ChessMove> addMovesEnemy(ChessPosition positionToCheck, ArrayList<ChessMove> moveList, boolean promotion) {
         if (checkPositionOnBoard(positionToCheck)) {
             if (!checkUnoccupation(positionToCheck)) {
                 if (checkEnemyOccupation(positionToCheck)) {
