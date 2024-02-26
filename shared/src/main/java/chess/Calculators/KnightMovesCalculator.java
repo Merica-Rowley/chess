@@ -22,68 +22,53 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
 
         // 1. Position (row + 2, col + 1)
         positionToCheck = new ChessPosition((myPosition.getRow() + 2), (myPosition.getColumn() + 1));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 2. Position (row + 1, col + 2)
         positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() + 2));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 3. Position (row - 1, col + 2)
         positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() + 2));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 4. Position (row - 2, col + 1)
         positionToCheck = new ChessPosition((myPosition.getRow() - 2), (myPosition.getColumn() + 1));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 5. Position (row - 2, row - 1)
         positionToCheck = new ChessPosition((myPosition.getRow() - 2), (myPosition.getColumn() - 1));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 6. Position (row - 1, col - 2)
         positionToCheck = new ChessPosition((myPosition.getRow() - 1), (myPosition.getColumn() - 2));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 7. Position (row + 1, col - 2)
         positionToCheck = new ChessPosition((myPosition.getRow() + 1), (myPosition.getColumn() - 2));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         // 8. Position (row + 2, col - 1)
         positionToCheck = new ChessPosition((myPosition.getRow() + 2), (myPosition.getColumn() - 1));
-        if (checkToAddMove(positionToCheck)) {
+        if (checkPositionOnBoard(positionToCheck) && ((board.getPiece(positionToCheck) == null) || board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
             moveList.add(new ChessMove(myPosition, positionToCheck, null));
         }
 
         return moveList;
-    }
-
-    /**
-     * Returns true if the positionToCheck is on the board and is either empty or occupied by an enemy piece.
-     */
-    public boolean checkToAddMove(ChessPosition positionToCheck) {
-        if (checkPositionOnBoard(positionToCheck)) {
-            if (board.getPiece(positionToCheck) == null) {
-                return true;
-            }
-            if (board.getPiece(positionToCheck).getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
