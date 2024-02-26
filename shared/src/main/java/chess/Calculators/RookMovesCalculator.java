@@ -33,65 +33,33 @@ public class RookMovesCalculator implements PieceMovesCalculator {
             if (arm1){
                 positionToCheck = new ChessPosition((myPosition.getRow() + increment), myPosition.getColumn());
                 if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm1 = false;
-                    } else {
-                        arm1 = false;
-                    }
-                } else {
-                    arm1 = false;
+                    if (checkUnoccupation(positionToCheck) || checkEnemyOccupation(positionToCheck)) moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
+                arm1 = checkPositionOnBoard(positionToCheck) && checkUnoccupation(positionToCheck);
             }
 
             if (arm2){
                 positionToCheck = new ChessPosition((myPosition.getRow() - increment), myPosition.getColumn());
                 if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm2 = false;
-                    } else {
-                        arm2 = false;
-                    }
-                } else {
-                    arm2 = false;
+                    if (checkUnoccupation(positionToCheck) || checkEnemyOccupation(positionToCheck)) moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
+                arm2 = checkPositionOnBoard(positionToCheck) && checkUnoccupation(positionToCheck);
             }
 
             if (arm3){
                 positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() + increment));
                 if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm3 = false;
-                    } else {
-                        arm3 = false;
-                    }
-                } else {
-                    arm3 = false;
+                    if (checkUnoccupation(positionToCheck) || checkEnemyOccupation(positionToCheck)) moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
+                arm3 = checkPositionOnBoard(positionToCheck) && checkUnoccupation(positionToCheck);
             }
 
             if (arm4){
                 positionToCheck = new ChessPosition(myPosition.getRow(), (myPosition.getColumn() - increment));
                 if (checkPositionOnBoard(positionToCheck)) {
-                    if (checkUnoccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                    } else if (checkEnemyOccupation(positionToCheck)) {
-                        moveList.add(new ChessMove(myPosition, positionToCheck, null));
-                        arm4 = false;
-                    } else {
-                        arm4 = false;
-                    }
-                } else {
-                    arm4 = false;
+                    if (checkUnoccupation(positionToCheck) || checkEnemyOccupation(positionToCheck)) moveList.add(new ChessMove(myPosition, positionToCheck, null));
                 }
+                arm4 = checkPositionOnBoard(positionToCheck) && checkUnoccupation(positionToCheck);
             }
         }
 
