@@ -4,8 +4,6 @@ import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
 
 public interface AuthDAO {
-    public int size();
-
     // create
     public void insertAuthData(AuthData a) throws DataAccessException;
 

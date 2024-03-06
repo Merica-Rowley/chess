@@ -13,7 +13,8 @@ import spark.Response;
 import java.util.ArrayList;
 
 public class Handler {
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+//    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final AuthDAO authDAO = new DBAuthDAO();
     private final GameDAO gameDAO = new MemoryGameDAO();
     private final UserDAO userDAO = new MemoryUserDAO();
 
@@ -23,7 +24,7 @@ public class Handler {
         try {
             service.clear();
             response.status(200);
-            return "";
+            return "{}";
         } catch (DataAccessException e) {
             response.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
