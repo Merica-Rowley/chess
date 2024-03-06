@@ -81,7 +81,7 @@ public class Handler {
         try {
             service.logoutUser(authToken);
             response.status(200);
-            return "";
+            return "{}";
         } catch (NotLoggedInException e) {
             response.status(401);
             return gson.toJson(new ResponseMessage(e.getMessage()));
@@ -143,7 +143,7 @@ public class Handler {
         try {
             service.joinGame(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
             response.status(200);
-            return "";
+            return "{}";
         } catch (NoGameFoundException e) {
             response.status(400);
             return gson.toJson(new ResponseMessage(e.getMessage()));

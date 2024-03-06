@@ -1,5 +1,6 @@
 package dataAccess;
 
+import com.google.gson.Gson;
 import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
 
@@ -12,15 +13,35 @@ import static java.sql.Types.NULL;
 public class DBAuthDAO implements AuthDAO {
     public void insertAuthData(AuthData a) throws DataAccessException {
         configureDatabase();
+        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+        String authToken = a.authToken();
+        String username = a.username();
+        executeUpdate(statement, authToken, username);
     }
 
     public AuthData getAuthData(String authToken) throws DataAccessException {
         configureDatabase();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM AuthData WHERE authToken=?";
+            var ps = conn.prepareStatement(statement);
+            ps.setString(1, authToken);
+            var rs = ps.executeQuery();
+                if (rs.next()) {
+                    String username = rs.getString("username");
+                    return new AuthData(authToken, username);
+                }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+
         return null;
     }
 
     public void deleteAuthData(String authToken) throws DataAccessException {
         configureDatabase();
+        var statement = "DELETE FROM AuthData WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
 
     public void deleteAllAuthData() throws DataAccessException {
