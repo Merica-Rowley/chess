@@ -16,7 +16,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void insertUser(UserData user) throws DataAccessException {
-        if (storage.containsKey(user.username())) throw new UserAlreadyExistsException("Error: username already associated taken");
+        if (storage.containsKey(user.username())) throw new UserAlreadyExistsException("Error: username already taken");
         if (user.username() == null || user.password() == null || user.email() == null) throw new MissingInformationException("Error: missing registration information");
         storage.put(user.username(), user);
     }

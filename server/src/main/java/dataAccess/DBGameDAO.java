@@ -3,6 +3,8 @@ package dataAccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NoGameFoundException;
+import dataAccess.Exceptions.TeamTakenException;
 import model.GameData;
 import model.UserData;
 
@@ -69,12 +71,16 @@ public class DBGameDAO implements GameDAO {
 
     public void setWhiteUsername(int gameID, String whiteUsername) throws DataAccessException {
         configureDatabase();
+        if (this.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
+        if (this.getGameData(gameID).whiteUsername() != null) throw new TeamTakenException("Error: white is already taken");
         var statement = "UPDATE GameData SET whiteUsername=? WHERE gameID=?";
         executeUpdate(statement, whiteUsername, gameID);
     }
 
     public void setBlackUsername(int gameID, String blackUsername) throws DataAccessException {
         configureDatabase();
+        if (this.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
+        if (this.getGameData(gameID).blackUsername() != null) throw new TeamTakenException("Error: black is already taken");
         var statement = "UPDATE GameData SET blackUsername=? WHERE gameID=?";
         executeUpdate(statement, blackUsername, gameID);
     }
@@ -119,7 +125,7 @@ public class DBGameDAO implements GameDAO {
               PRIMARY KEY (`gameID`),
               INDEX(whiteUsername),
               INDEX(blackUsername),
-              Index(gameName)
+              INDEX(gameName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

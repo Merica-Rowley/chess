@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NoGameFoundException;
 import dataAccess.GameDAO;
 import dataAccess.Exceptions.MissingInformationException;
 import model.AuthData;
@@ -35,7 +36,7 @@ public class GameService {
     public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
         AuthData authData = authDAO.getAuthData(authToken); // throws NotLoggedInException if user is not logged in
         String username = authData.username();
-        gameDAO.getGameData(gameID); // throws NoGameFoundException if gameID doesn't correspond to an existing game
+        if(gameDAO.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
         if (playerColor != null) {
             switch (playerColor) {
                 case WHITE:
