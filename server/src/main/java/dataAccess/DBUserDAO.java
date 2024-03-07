@@ -3,8 +3,6 @@ package dataAccess;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.MissingInformationException;
 import dataAccess.Exceptions.UserAlreadyExistsException;
-import dataAccess.Exceptions.UserNotFoundException;
-import model.AuthData;
 import model.UserData;
 
 import java.sql.SQLException;

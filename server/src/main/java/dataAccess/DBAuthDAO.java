@@ -1,15 +1,12 @@
 package dataAccess;
 
-import com.google.gson.Gson;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NotLoggedInException;
 import model.AuthData;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 public class DBAuthDAO implements AuthDAO {
     public void insertAuthData(AuthData a) throws DataAccessException {

@@ -6,7 +6,6 @@ import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NoGameFoundException;
 import dataAccess.Exceptions.TeamTakenException;
 import model.GameData;
-import model.UserData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
