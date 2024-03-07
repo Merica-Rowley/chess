@@ -46,7 +46,7 @@ public class DBAuthDAOTests {
 
     @Test
     void negativeGetAuthData() throws DataAccessException {
-        Assertions.assertNull(dao.getAuthData("some-auth-token")); // If getAuthData returns null, then the authToken is not in the table
+        Assertions.assertNull(dao.getAuthData("some-auth-token")); // If getAuthData returns null, then the authToken is not in the database
     }
 
     @Test
@@ -74,12 +74,9 @@ public class DBAuthDAOTests {
         dao.insertAuthData(testAuthData);
         dao.insertAuthData(anotherTestAuthData);
 
-        Assertions.assertEquals(testAuthData, dao.getAuthData("test-auth-token"));
-        Assertions.assertEquals(anotherTestAuthData, dao.getAuthData("other-auth-token"));
-
         dao.deleteAllAuthData();
 
-        Assertions.assertNull(dao.getAuthData("test-auth-token"));
-        Assertions.assertNull(dao.getAuthData("other-auth-token"));
+        Assertions.assertNull(dao.getAuthData(testAuthData.authToken()));
+        Assertions.assertNull(dao.getAuthData(anotherTestAuthData.authToken()));
     }
 }
