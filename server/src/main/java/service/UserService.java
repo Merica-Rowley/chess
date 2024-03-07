@@ -7,6 +7,7 @@ import dataAccess.Exceptions.NoGameFoundException;
 import dataAccess.Exceptions.UserNotFoundException;
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -21,7 +22,11 @@ public class UserService {
     }
 
     public AuthData registerUser(String username, String password, String email) throws DataAccessException {
-        userDAO.insertUser(new UserData(username, password, email));
+        // Encrypt password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(password);
+
+        userDAO.insertUser(new UserData(username, hashedPassword, email));
         AuthData authData = this.createAuth(username);
         authDAO.insertAuthData(authData);
         return authData;
@@ -30,7 +35,11 @@ public class UserService {
     public AuthData loginUser(String username, String password) throws DataAccessException, IncorrectPasswordException {
         UserData userObject = userDAO.getUser(username);
         if (userObject == null) throw new UserNotFoundException("Error: No user with username found");
-        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("Error: incorrect password");
+
+        // Checking encrypted password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if (!encoder.matches(password, userObject.password())) throw new IncorrectPasswordException("Error: incorrect password");
         AuthData authData = this.createAuth(username);
         authDAO.insertAuthData(authData);
         return authData;
