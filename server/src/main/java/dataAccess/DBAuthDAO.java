@@ -2,6 +2,7 @@ package dataAccess;
 
 import com.google.gson.Gson;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.NotLoggedInException;
 import model.AuthData;
 
 import javax.xml.crypto.Data;
@@ -13,6 +14,7 @@ import static java.sql.Types.NULL;
 public class DBAuthDAO implements AuthDAO {
     public void insertAuthData(AuthData a) throws DataAccessException {
         configureDatabase();
+        if (this.getAuthData(a.authToken()) != null) throw new DataAccessException("Error: authToken already associated with user");
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
         String authToken = a.authToken();
         String username = a.username();
@@ -40,6 +42,7 @@ public class DBAuthDAO implements AuthDAO {
 
     public void deleteAuthData(String authToken) throws DataAccessException {
         configureDatabase();
+        if (this.getAuthData(authToken) == null) throw new NotLoggedInException("Error: authToken not found; user not logged in");
         var statement = "DELETE FROM AuthData WHERE authToken=?";
         executeUpdate(statement, authToken);
     }
