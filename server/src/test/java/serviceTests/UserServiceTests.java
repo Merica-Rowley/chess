@@ -9,6 +9,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.UserService;
 
 public class UserServiceTests {
@@ -20,17 +21,19 @@ public class UserServiceTests {
         AuthDAO testAuthDAO = new MemoryAuthDAO();
 
         UserService service = new UserService(testUserDAO, testAuthDAO);
-        AuthData authData = service.registerUser("user1", "pass123", "qwerty@mail.com");
+        UserData testUser = new UserData("user1", "pass123", "querty@mail.com");
+        AuthData authData = service.registerUser(testUser.username(), testUser.password(), testUser.email());
 
         // Tests insertion in UserDAO
-        String expectedPassword = "pass123";
+        // Checking encrypted password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String actualPassword = testUserDAO.getUser("user1").password();
 
         // Tests insertion in AuthDAO
         String expectedUser = "user1";
         String actualUser = testAuthDAO.getAuthData(authData.authToken()).username();
 
-        Assertions.assertEquals(expectedPassword, actualPassword);
+        Assertions.assertTrue(encoder.matches(testUser.password(), actualPassword));
         Assertions.assertEquals(expectedUser,actualUser);
 ;    }
 

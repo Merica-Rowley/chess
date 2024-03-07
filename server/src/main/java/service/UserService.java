@@ -1,10 +1,7 @@
 package service;
 
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.IncorrectPasswordException;
-import dataAccess.Exceptions.NoGameFoundException;
-import dataAccess.Exceptions.UserNotFoundException;
+import dataAccess.Exceptions.*;
 import model.AuthData;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +19,7 @@ public class UserService {
     }
 
     public AuthData registerUser(String username, String password, String email) throws DataAccessException {
+        if (username == null || password == null || email == null) throw new MissingInformationException("Error: missing registration information");
         // Encrypt password
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPassword = encoder.encode(password);

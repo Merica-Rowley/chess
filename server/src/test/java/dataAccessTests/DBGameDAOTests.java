@@ -39,7 +39,10 @@ public class DBGameDAOTests {
 
     @Test
     void negativeInsertGame() throws DataAccessException {
-
+        GameData testGameData = new GameData(0, null, null, "My Chess Game", new ChessGame());
+        int gameID = dao.insertGame(testGameData);
+        // AutoIncrement should automatically set the gameID; therefore, the gameID should be greater than or equal to 0
+        Assertions.assertNotEquals(0, dao.getGameData(gameID));
     }
 
     @Test
@@ -77,7 +80,8 @@ public class DBGameDAOTests {
 
     @Test
     void negativeListGames() throws DataAccessException {
-
+        ArrayList<GameData> emptyList = new ArrayList<GameData>();
+        Assertions.assertEquals(emptyList, dao.listGames());
     }
 
     @Test
