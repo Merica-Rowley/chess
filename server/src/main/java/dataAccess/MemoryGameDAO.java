@@ -22,9 +22,10 @@ public class MemoryGameDAO implements GameDAO {
         return storage.size();
     }
 
-    public void insertGame(GameData game) throws DataAccessException {
+    public int insertGame(GameData game) throws DataAccessException {
         if (storage.containsKey(game.gameID())) throw new DataAccessException("Error: gameID already associated with a game");
         storage.put(game.gameID(), game);
+        return game.gameID();
     }
 
     public GameData getGameData(int gameID) throws DataAccessException {

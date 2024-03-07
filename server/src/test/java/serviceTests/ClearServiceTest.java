@@ -28,7 +28,7 @@ public class ClearServiceTest {
         ClearService testClearService = new ClearService(testUserDAO, testGameDAO, testAuthDAO);
         testClearService.clear();
 
-        int actual = testUserDAO.size() + testGameDAO.size() + testAuthDAO.size();
+        int actual = ((MemoryUserDAO) testUserDAO).size() + ((MemoryGameDAO) testGameDAO).size() + ((MemoryAuthDAO) testAuthDAO).size();
 
         Assertions.assertEquals(0, actual);
     }

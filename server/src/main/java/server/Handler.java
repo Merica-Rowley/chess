@@ -15,8 +15,13 @@ import java.util.ArrayList;
 public class Handler {
 //    private final AuthDAO authDAO = new MemoryAuthDAO();
     private final AuthDAO authDAO = new DBAuthDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
-    private final UserDAO userDAO = new MemoryUserDAO();
+
+//    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final GameDAO gameDAO = new DBGameDAO();
+
+//    private final UserDAO userDAO = new MemoryUserDAO();
+    private final UserDAO userDAO = new DBUserDAO();
+
 
     public Object clearApplication(Request request, Response response) {
         ClearService service = new ClearService(userDAO, gameDAO, authDAO);

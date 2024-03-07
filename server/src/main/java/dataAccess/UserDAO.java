@@ -5,8 +5,6 @@ import dataAccess.Exceptions.UserAlreadyExistsException;
 import model.UserData;
 
 public interface UserDAO {
-    public int size();
-
     // create
     public void insertUser(UserData user) throws DataAccessException, UserAlreadyExistsException;
 

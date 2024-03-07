@@ -29,9 +29,7 @@ public class GameService {
     public int createGame(String authToken, String gameName) throws DataAccessException {
         if (gameName == null) throw new MissingInformationException("Error: no game name");
         authDAO.getAuthData(authToken); // throws NotLoggedInException if user is not logged in
-        int gameID = gameDAO.getNextID();
-        gameDAO.insertGame(new GameData(gameID, null, null, gameName, new ChessGame()));
-        return gameID;
+        return gameDAO.insertGame(new GameData(0, null, null, gameName, new ChessGame()));
     }
 
     public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {

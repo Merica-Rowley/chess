@@ -1,36 +1,40 @@
 package dataAccess;
 
-import com.google.gson.Gson;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.UserAlreadyExistsException;
 import model.AuthData;
+import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
-public class DBAuthDAO implements AuthDAO {
-    public void insertAuthData(AuthData a) throws DataAccessException {
+public class DBUserDAO implements UserDAO {
+    public void insertUser(UserData user) throws DataAccessException {
         configureDatabase();
-        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
-        String authToken = a.authToken();
-        String username = a.username();
-        executeUpdate(statement, authToken, username);
+
+        if(this.getUser(user.username()) != null) throw new UserAlreadyExistsException("Error: username already taken");
+
+        var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
+        String username = user.username();
+        String password = user.password();
+        String email = user.email();
+        executeUpdate(statement, username, password, email);
     }
 
-    public AuthData getAuthData(String authToken) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         configureDatabase();
 
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username FROM AuthData WHERE authToken=?";
+            var statement = "SELECT password, email FROM UserData WHERE username=?";
             var ps = conn.prepareStatement(statement);
-            ps.setString(1, authToken);
+            ps.setString(1, username);
             var rs = ps.executeQuery();
-                if (rs.next()) {
-                    String username = rs.getString("username");
-                    return new AuthData(authToken, username);
-                }
+            if (rs.next()) {
+                String password = rs.getString("password");
+                String email = rs.getString("email");
+                return new UserData(username, password, email);
+            }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
@@ -38,15 +42,9 @@ public class DBAuthDAO implements AuthDAO {
         return null;
     }
 
-    public void deleteAuthData(String authToken) throws DataAccessException {
+    public void deleteAllUsers() throws DataAccessException {
         configureDatabase();
-        var statement = "DELETE FROM AuthData WHERE authToken=?";
-        executeUpdate(statement, authToken);
-    }
-
-    public void deleteAllAuthData() throws DataAccessException {
-        configureDatabase();
-        var statement = "TRUNCATE AuthData";
+        var statement = "TRUNCATE UserData";
         executeUpdate(statement);
     }
 
@@ -73,11 +71,13 @@ public class DBAuthDAO implements AuthDAO {
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS AuthData (
-              `authToken` varchar(256) NOT NULL,
+            CREATE TABLE IF NOT EXISTS UserData (
               `username` varchar(256) NOT NULL,
-              PRIMARY KEY (`authToken`),
-              INDEX(username)
+              `password` varchar(256) NOT NULL,
+              `email` varchar(256) NOT NULL,
+              PRIMARY KEY (`username`),
+              INDEX(password),
+              INDEX(email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

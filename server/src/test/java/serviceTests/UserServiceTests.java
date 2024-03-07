@@ -89,9 +89,9 @@ public class UserServiceTests {
 
         try {
             AuthData authData = service.loginUser("someUser", "pass");
-            Assertions.assertEquals(1, testAuthDAO.size()); // make sure someUser's login registers to the AuthDAO
+            Assertions.assertEquals(1, ((MemoryAuthDAO) testAuthDAO).size()); // make sure someUser's login registers to the AuthDAO
             service.logoutUser(authData.authToken());
-            Assertions.assertEquals(0, testAuthDAO.size()); // make sure someUser's authData was removed
+            Assertions.assertEquals(0, ((MemoryAuthDAO) testAuthDAO).size()); // make sure someUser's authData was removed
         } catch (IncorrectPasswordException ignored) {
         }
     }
