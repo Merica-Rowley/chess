@@ -1,6 +1,7 @@
 package dataAccess;
 
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.MissingInformationException;
 import dataAccess.Exceptions.UserAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
@@ -13,6 +14,7 @@ public class DBUserDAO implements UserDAO {
     public void insertUser(UserData user) throws DataAccessException {
         configureDatabase();
 
+        if (user.username() == null || user.password() == null || user.email() == null) throw new MissingInformationException("Error: missing registration information");
         if(this.getUser(user.username()) != null) throw new UserAlreadyExistsException("Error: username already taken");
 
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
