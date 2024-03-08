@@ -42,7 +42,7 @@ public class DBGameDAOTests {
         GameData testGameData = new GameData(0, null, null, "My Chess Game", new ChessGame());
         int gameID = dao.insertGame(testGameData);
         // AutoIncrement should automatically set the gameID; therefore, the gameID should be greater than or equal to 0
-        Assertions.assertNotEquals(0, dao.getGameData(gameID));
+        Assertions.assertNotEquals(0, dao.getGameData(gameID).gameID());
     }
 
     @Test
