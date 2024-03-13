@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
+import model.ResponseMessage;
 import model.UserData;
 
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static java.lang.String.format;
+
 public class ServerFacade {
     private final int port;
     private String authToken = "";
@@ -20,7 +23,7 @@ public class ServerFacade {
         this.port = port;
     }
 
-    public void register(String username, String password, String email) throws URISyntaxException, IOException {
+    public String register(String username, String password, String email) throws URISyntaxException, IOException {
         URI uri = new URI("http://localhost:" + port + "/user");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("POST");
@@ -39,12 +42,22 @@ public class ServerFacade {
         // Make request
         http.connect();
 
-        // Output response
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            AuthData response = new Gson().fromJson(inputStreamReader, AuthData.class);
-            this.authToken = response.authToken();
-            System.out.println(response);
+        int responseCode = http.getResponseCode();
+
+        switch (responseCode) {
+            case 200:
+                try (InputStream respBody = http.getInputStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                    AuthData response = new Gson().fromJson(inputStreamReader, AuthData.class);
+                    this.authToken = response.authToken();
+                    return format("Success! Registered with username: %s", response.username());
+                }
+            default: // Catches all errors and displays the error message
+                try (InputStream errorBody = http.getErrorStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
+                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
+                    return errorMessage.message();
+                }
         }
     }
 
