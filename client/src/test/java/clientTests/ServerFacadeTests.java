@@ -44,12 +44,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
     @Test
     public void positiveRegisterTest() throws URISyntaxException, IOException {
         String response = facade.register("testUser", "password", "email.com");
