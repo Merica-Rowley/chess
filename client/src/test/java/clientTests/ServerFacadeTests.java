@@ -70,4 +70,26 @@ public class ServerFacadeTests {
 
         Assertions.assertEquals("Error: username already taken", response);
     }
+
+    @Test
+    public void positiveLoginTest() throws URISyntaxException, IOException {
+        facade.register("user21", "greatpassword", "hola@mail.com");
+        String response = facade.login("user21", "greatpassword");
+
+        Assertions.assertEquals("Success! Logged in as: user21", response);
+    }
+
+    @Test
+    public void negativeLoginTest() throws URISyntaxException, IOException {
+        // Attempt to login a user that doesn't exist
+        String response = facade.login("ghostUser", "somepassword");
+
+        Assertions.assertEquals("Error: No user with username found", response);
+
+        // Attempt to login an existing user with an incorrect password
+        facade.register("testing123", "abcde", "email.com");
+        response = facade.login("testing123", "fghij");
+
+        Assertions.assertEquals("Error: incorrect password", response);
+    }
 }
