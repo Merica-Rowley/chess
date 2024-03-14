@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
+import model.LoginRequest;
 import model.ResponseMessage;
 import model.UserData;
 
@@ -61,8 +62,42 @@ public class ServerFacade {
         }
     }
 
-    public void login(String username, String password) {
-        // post
+    public String login(String username, String password) throws IOException, URISyntaxException {
+        URI uri = new URI("http://localhost:" + port + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("POST");
+
+        http.setDoOutput(true);
+        // Header that specifies that body will be of type json
+        http.addRequestProperty("Content-Type", "application/json");
+
+        // Write body
+        LoginRequest body = new LoginRequest(username, password);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        // Make request
+        http.connect();
+
+        int responseCode = http.getResponseCode();
+
+        switch (responseCode) {
+            case 200:
+                try (InputStream respBody = http.getInputStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                    AuthData response = new Gson().fromJson(inputStreamReader, AuthData.class);
+                    this.authToken = response.authToken();
+                    return format("Success! Logged in as: %s", response.username());
+                }
+            default: // Catches all errors and displays the error message
+                try (InputStream errorBody = http.getErrorStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
+                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
+                    return errorMessage.message();
+                }
+        }
     }
 
     public void logout() {

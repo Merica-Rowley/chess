@@ -13,7 +13,8 @@ public class Main {
         System.out.println("♕ 240 Chess Client: " + piece);
         ServerFacade facade = new ServerFacade(port);
         try {
-            facade.register("myme", "pass", "email@mail.com");
+            System.out.println(facade.register("mme", "pass", "email@mail.com"));
+            System.out.println(facade.login("mme", "pass"));
         } catch (IOException | URISyntaxException e) {
             System.out.println(e.getMessage());
         }
