@@ -86,4 +86,20 @@ public class ServerFacadeTests {
 
         Assertions.assertEquals("Error: incorrect password", response);
     }
+
+    @Test
+    public void positiveLogoutTest() throws URISyntaxException, IOException {
+        facade.register("chessPlayer", "psswrd", "hola@mail.com"); // Registers and logs in
+        String response = facade.logout();
+
+        Assertions.assertEquals("Success! Logged out", response);
+    }
+
+    @Test
+    public void negativeLogoutTest() throws URISyntaxException, IOException {
+        // Attempt to logout a user that isn't logged in
+        String response = facade.logout();
+
+        Assertions.assertEquals("Error: authToken not found; user not logged in", response);
+    }
 }
