@@ -126,4 +126,25 @@ public class ServerFacadeTests {
 
         Assertions.assertEquals("Error: no game name", response);
     }
+
+    @Test
+    public void positiveListGamesTest() throws URISyntaxException, IOException {
+        facade.register("hi", "nhymju,ki.lo/;p", "otheremail@mail.com"); // Registers and logs in
+        facade.createGame("game1");
+        facade.createGame("game2");
+
+        String response = facade.listGames();
+
+        String expected = "1 game1\nWhite Team: No Player\nBlack Team: No Player\n\n2 game2\nWhite Team: No Player\nBlack Team: No Player\n";
+
+        Assertions.assertEquals(expected, response);
+    }
+
+    @Test
+    public void negativeListGamesTest() throws URISyntaxException, IOException {
+        // Attempt to list games when not logged in
+        String response = facade.listGames();
+
+        Assertions.assertEquals("Error: authToken not found; user not logged in", response);
+    }
 }

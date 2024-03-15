@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 
@@ -163,8 +164,48 @@ public class ServerFacade {
         }
     }
 
-    public void listGames() {
-        // get
+    public String listGames() throws URISyntaxException, IOException {
+        URI uri = new URI("http://localhost:" + port + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("GET");
+
+        http.setDoOutput(true);
+        // Header that specifies that body will be of type json
+        http.addRequestProperty("Content-Type", "application/json");
+        http.addRequestProperty("Authorization", authToken);
+
+        // Make request
+        http.connect();
+
+        int responseCode = http.getResponseCode();
+
+        switch (responseCode) {
+            case 200:
+                try (InputStream respBody = http.getInputStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                    ArrayList<GameListData> response = new Gson().fromJson(inputStreamReader, ResponseGameList.class).games();
+                    String gameList = "";
+                    String separator = "";
+
+                    for (GameListData game : response) {
+                        gameList += separator;
+                        gameList += game.gameID() + " " + game.gameName() + "\n";
+                        String whiteUser = (game.whiteUsername() == null ? "No Player" : game.whiteUsername());
+                        gameList += "White Team: " + whiteUser + "\n";
+                        String blackUser = (game.blackUsername() == null ? "No Player" : game.blackUsername());
+                        gameList += "Black Team: " + blackUser + "\n";
+                        separator = "\n";
+                    }
+
+                    return format(gameList);
+                }
+            default: // Catches all errors and displays the error message
+                try (InputStream errorBody = http.getErrorStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
+                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
+                    return errorMessage.message();
+                }
+        }
     }
 
     public void joinGame(int gameID, ChessGame.TeamColor teamColor) {

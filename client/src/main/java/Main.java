@@ -15,7 +15,9 @@ public class Main {
         try {
             System.out.println(facade.register("mme", "pass", "email@mail.com"));
             System.out.println(facade.login("mme", "pass"));
-            System.out.println(facade.logout());
+            System.out.println(facade.createGame("game3"));
+            System.out.println(facade.createGame("game4"));
+            System.out.println(facade.listGames());
         } catch (IOException | URISyntaxException e) {
             System.out.println(e.getMessage());
         }
