@@ -102,4 +102,28 @@ public class ServerFacadeTests {
 
         Assertions.assertEquals("Error: authToken not found; user not logged in", response);
     }
+
+    @Test
+    public void positiveCreateGameTest() throws URISyntaxException, IOException {
+        facade.register("Player73", "12345", "hello@email.com"); // Registers and logs in
+        String response = facade.createGame("myawesomegame");
+
+        // Because the database should be empty before each test, the created game will have id 1
+        Assertions.assertEquals("Success! Created game with id: 1", response);
+    }
+
+    @Test
+    public void negativeCreateGameTest() throws URISyntaxException, IOException {
+        // Attempt to create a game when not logged in
+        String response = facade.createGame("test");
+
+        Assertions.assertEquals("Error: authToken not found; user not logged in", response);
+
+        facade.register("chessplayer", "1qazxsw23edcvfr45tgb", "email@mail.com"); // Registers and logs in
+
+        // Attempt to create a game with no name
+        response = facade.createGame(null);
+
+        Assertions.assertEquals("Error: no game name", response);
+    }
 }
