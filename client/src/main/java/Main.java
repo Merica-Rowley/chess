@@ -18,6 +18,8 @@ public class Main {
             System.out.println(facade.createGame("game3"));
             System.out.println(facade.createGame("game4"));
             System.out.println(facade.listGames());
+            System.out.println(facade.joinGame(1, ChessGame.TeamColor.WHITE));
+            System.out.println(facade.listGames());
         } catch (IOException | URISyntaxException e) {
             System.out.println(e.getMessage());
         }

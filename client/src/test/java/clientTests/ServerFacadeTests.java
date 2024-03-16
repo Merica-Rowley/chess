@@ -1,5 +1,6 @@
 package clientTests;
 
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
@@ -146,5 +147,42 @@ public class ServerFacadeTests {
         String response = facade.listGames();
 
         Assertions.assertEquals("Error: authToken not found; user not logged in", response);
+    }
+
+    @Test
+    public void positiveJoinGame() throws URISyntaxException, IOException {
+        facade.register("howdy", ")(*&^%$#@!", "mymail@email.com"); // Registers and logs in
+        facade.createGame("A Game");
+
+        String response = facade.joinGame(1, ChessGame.TeamColor.BLACK);
+
+        Assertions.assertEquals("Success! Joined game", response);
+
+        String listActual = facade.listGames();
+        String listExpected = "1 A Game\nWhite Team: No Player\nBlack Team: howdy\n";
+
+        Assertions.assertEquals(listExpected, listActual);
+    }
+
+    @Test
+    public void negativeJoinGame() throws URISyntaxException, IOException {
+        // Attempt to join a game while not logged in
+        String response = facade.joinGame(1, ChessGame.TeamColor.WHITE);
+
+        Assertions.assertEquals("Error: authToken not found; user not logged in", response);
+
+        facade.register("yep", "[][][][]", "hi@123.com");
+
+        // Attempt to join a game that doesn't exist
+        response = facade.joinGame(1, ChessGame.TeamColor.BLACK);
+
+        Assertions.assertEquals("Error: No game found with gameID", response);
+
+        // Attempt to join as a color that has already been taken
+        facade.createGame("testGame");
+        facade.joinGame(1, ChessGame.TeamColor.WHITE);
+        response = facade.joinGame(1, ChessGame.TeamColor.WHITE);
+
+        Assertions.assertEquals("Error: white is already taken", response);
     }
 }

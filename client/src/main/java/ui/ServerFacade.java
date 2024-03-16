@@ -208,7 +208,37 @@ public class ServerFacade {
         }
     }
 
-    public void joinGame(int gameID, ChessGame.TeamColor teamColor) {
-        // put
+    public String joinGame(int gameID, ChessGame.TeamColor teamColor) throws URISyntaxException, IOException {
+        URI uri = new URI("http://localhost:" + port + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("PUT");
+
+        http.setDoOutput(true);
+        // Header that specifies that body will be of type json
+        http.addRequestProperty("Content-Type", "application/json");
+        http.addRequestProperty("Authorization", authToken);
+
+        // Write body
+        JoinGameRequest body = new JoinGameRequest(teamColor, gameID);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        // Make request
+        http.connect();
+
+        int responseCode = http.getResponseCode();
+
+        switch (responseCode) {
+            case 200:
+                return "Success! Joined game";
+            default: // Catches all errors and displays the error message
+                try (InputStream errorBody = http.getErrorStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
+                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
+                    return errorMessage.message();
+                }
+        }
     }
 }
