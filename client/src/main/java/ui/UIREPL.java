@@ -1,6 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -119,6 +122,8 @@ public class UIREPL {
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     System.out.println("Error: missing input\nPlease enter a game id.");
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: invalid game id\nPlease enter a valid game id.");
                 }
             } else if (input[0].equals("logout")) {
                 System.out.println(facade.logout());
@@ -136,11 +141,111 @@ public class UIREPL {
                 System.out.println("\tobserve <ID> - Observe a game");
                 System.out.println("\tlogout - Log out");
                 System.out.println("\tquit - Exit the program");
-                System.out.println("\thelp - View possible commands");            }
+                System.out.println("\thelp - View possible commands");
+            }
         }
     }
 
     private void gameplay() {
-        System.out.println("in gameplay");
+        this.printBoard(new ChessGame());
+    }
+
+    private void printBoard(ChessGame chessGame) {
+        ChessBoard board = chessGame.getBoard();
+        board.resetBoard(); // Sets the board to an initial set up
+
+        // Orientation with black at the bottom
+        for (int row = 9; row >= 0; row--) {
+            if ((row == 0) || row == 9) {
+                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + "\u001b[30;49m");
+            } else {
+                for (int col = 9; col >= 0; col--) {
+                    if ((col == 0) || (col == 9)) {
+                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (9 - row));
+                    } else {
+                        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                        boolean lightSpace = ((row + col) % 2 == 0);
+                        this.printPiece(piece, lightSpace);
+                    }
+                }
+                System.out.print("\u001b[30;49m\n");
+            }
+        }
+
+        System.out.print("\n");
+
+        // Orientation with white at the bottom
+        for (int row = 0; row < 10; row++) {
+            if ((row == 0) || row == 9) {
+                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + "\u001b[30;49m");
+            } else {
+                for (int col = 0; col < 10; col++) {
+                    if ((col == 0) || (col == 9)) {
+                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (9 - row));
+                    } else {
+                        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                        boolean lightSpace = ((row + col) % 2 == 0);
+                        this.printPiece(piece, lightSpace);
+                    }
+                }
+                System.out.print("\u001b[30;49m\n");
+            }
+        }
+    }
+
+    private void printPiece(ChessPiece piece, boolean lightSpace) {
+        if (lightSpace) {
+            System.out.print("\u001b[97;47m");
+        } else {
+            System.out.print("\u001b[97;100m");
+        }
+
+        if (piece != null) {
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                switch (piece.getPieceType()) {
+                    case KING:
+                        System.out.print(EscapeSequences.WHITE_KING);
+                        break;
+                    case QUEEN:
+                        System.out.print(EscapeSequences.WHITE_QUEEN);
+                        break;
+                    case BISHOP:
+                        System.out.print(EscapeSequences.WHITE_BISHOP);
+                        break;
+                    case KNIGHT:
+                        System.out.print(EscapeSequences.WHITE_KNIGHT);
+                        break;
+                    case ROOK:
+                        System.out.print(EscapeSequences.WHITE_ROOK);
+                        break;
+                    case PAWN:
+                        System.out.print(EscapeSequences.WHITE_PAWN);
+                        break;
+                }
+            } else {
+                switch (piece.getPieceType()) {
+                    case KING:
+                        System.out.print(EscapeSequences.BLACK_KING);
+                        break;
+                    case QUEEN:
+                        System.out.print(EscapeSequences.BLACK_QUEEN);
+                        break;
+                    case BISHOP:
+                        System.out.print(EscapeSequences.BLACK_BISHOP);
+                        break;
+                    case KNIGHT:
+                        System.out.print(EscapeSequences.BLACK_KNIGHT);
+                        break;
+                    case ROOK:
+                        System.out.print(EscapeSequences.BLACK_ROOK);
+                        break;
+                    case PAWN:
+                        System.out.print(EscapeSequences.BLACK_PAWN);
+                        break;
+                }
+            }
+        } else {
+            System.out.print(EscapeSequences.EMPTY);
+        }
     }
 }
