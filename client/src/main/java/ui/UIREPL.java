@@ -155,16 +155,16 @@ public class UIREPL {
         board.resetBoard(); // Sets the board to an initial set up
 
         // Orientation with black at the bottom
-        for (int row = 9; row >= 0; row--) {
+        for (int row = 0; row < 10; row++) {
             if ((row == 0) || row == 9) {
                 System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
                 for (int col = 9; col >= 0; col--) {
                     if ((col == 0) || (col == 9)) {
-                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (9 - row));
+                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
                     } else {
                         ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                        boolean lightSpace = ((row + col) % 2 == 0);
+                        boolean lightSpace = ((row + col) % 2 != 0);
                         this.printPiece(piece, lightSpace);
                     }
                 }
@@ -175,16 +175,16 @@ public class UIREPL {
         System.out.print("\n");
 
         // Orientation with white at the bottom
-        for (int row = 0; row < 10; row++) {
+        for (int row = 9; row >= 0; row--) {
             if ((row == 0) || row == 9) {
                 System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
                 for (int col = 0; col < 10; col++) {
                     if ((col == 0) || (col == 9)) {
-                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (9 - row));
+                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
                     } else {
                         ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                        boolean lightSpace = ((row + col) % 2 == 0);
+                        boolean lightSpace = ((row + col) % 2 != 0);
                         this.printPiece(piece, lightSpace);
                     }
                 }
