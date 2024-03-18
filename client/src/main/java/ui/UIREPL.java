@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
+import static chess.ChessGame.TeamColor.BLACK;
+
 public class UIREPL {
     private final ServerFacade facade;
 
@@ -93,16 +95,18 @@ public class UIREPL {
                 try {
                     // This would be true if a game id was included but not a team (in other words, the player will be an observer)
                     String response;
+                    ChessGame.TeamColor team;
                     if (input.length == 2) {
-                        response = facade.joinGame(Integer.parseInt(input[1]), null);
+                        team = null;
                     } else {
-                        response = facade.joinGame(Integer.parseInt(input[1]), ChessGame.TeamColor.valueOf(input[2]));
+                        team = ChessGame.TeamColor.valueOf(input[2]);
                     }
+                    response = facade.joinGame(Integer.parseInt(input[1]), team);
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.gameplay();
+                        this.gameplay(team);
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -117,7 +121,7 @@ public class UIREPL {
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.gameplay();
+                        this.gameplay(null);
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -146,20 +150,31 @@ public class UIREPL {
         }
     }
 
-    private void gameplay() {
-        this.printBoard(new ChessGame());
+    private void gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
+        if (team == BLACK) {
+            this.printBoardWhite(new ChessGame());
+            System.out.print("\n");
+            this.printBoardBlack(new ChessGame());
+        } else { // WHITE or observer
+            this.printBoardBlack(new ChessGame());
+            System.out.print("\n");
+            this.printBoardWhite(new ChessGame());
+        }
+        // For testing purposes
+        System.out.print("\u001b[39;49m"); // Set text back to default
+        this.postLogin();
     }
 
-    private void printBoard(ChessGame chessGame) {
+    private void printBoardWhite(ChessGame chessGame) {
         ChessBoard board = chessGame.getBoard();
         board.resetBoard(); // Sets the board to an initial set up
 
-        // Orientation with black at the bottom
-        for (int row = 0; row < 10; row++) {
+        // Orientation with white at the bottom
+        for (int row = 9; row >= 0; row--) {
             if ((row == 0) || row == 9) {
-                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + "\u001b[30;49m");
+                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
-                for (int col = 9; col >= 0; col--) {
+                for (int col = 0; col < 10; col++) {
                     if ((col == 0) || (col == 9)) {
                         System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
                     } else {
@@ -171,15 +186,18 @@ public class UIREPL {
                 System.out.print("\u001b[30;49m\n");
             }
         }
+    }
 
-        System.out.print("\n");
+    private void printBoardBlack(ChessGame chessGame) {
+        ChessBoard board = chessGame.getBoard();
+        board.resetBoard(); // Sets the board to an initial set up
 
-        // Orientation with white at the bottom
-        for (int row = 9; row >= 0; row--) {
+        // Orientation with black at the bottom
+        for (int row = 0; row < 10; row++) {
             if ((row == 0) || row == 9) {
-                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + "\u001b[30;49m");
+                System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
-                for (int col = 0; col < 10; col++) {
+                for (int col = 9; col >= 0; col--) {
                     if ((col == 0) || (col == 9)) {
                         System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
                     } else {
