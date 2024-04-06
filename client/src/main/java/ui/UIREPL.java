@@ -35,35 +35,30 @@ public class UIREPL {
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
-                    }
-                    else {
+                    } else {
                         this.postLogin();
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     System.out.println("Error: missing input\nPlease enter your username, password, and email.");
                 }
-            }
-            else if (input[0].equals("login")) {
+            } else if (input[0].equals("login")) {
                 try {
                     String response = facade.login(input[1], input[2]);
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
-                    }
-                    else {
+                    } else {
                         this.postLogin();
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     System.out.println("Error: missing input\nPlease enter your username and password.");
                 }
-            }
-            else if (input[0].equals("quit")) {
+            } else if (input[0].equals("quit")) {
                 System.out.println("Goodbye!");
                 break;
-            }
-            else { // Default case called with "help" or any other input
+            } else { // Default case called with "help" or any other input
                 System.out.println("\tregister <USERNAME> <PASSWORD> <EMAIL> - Create an account");
                 System.out.println("\tlogin <USERNAME> <PASSWORD> - Sign in");
                 System.out.println("\tquit - Exit the program");
@@ -151,6 +146,34 @@ public class UIREPL {
     }
 
     private void gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
+        while (true) {
+            System.out.print("[GAMEPLAY] >>> ");
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            var input = line.split(" ");
+
+            if (input[0].equals("redraw")) {
+                System.out.println("redrawing");
+            } else if (input[0].equals("leave")) {
+                System.out.println("leaving");
+            } else if (input[0].equals("move")) {
+                System.out.println("moving");
+            } else if (input[0].equals("resign")) {
+                System.out.println("resigning");
+            } else if (input[0].equals("show moves")) {
+                System.out.println("showing moves");
+            } else { // Default case called with "help" or any other input
+                System.out.println("\tredraw - Redraw the chess board");
+                System.out.println("\tleave - Leave the game");
+                System.out.println("\tmove <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN> - Move the piece from a starting position to a different position");
+                System.out.println("\tresign - Forfeit and end the game");
+                System.out.println("\tshow moves <ROW> <COLUMN> - Show the legal moves for a piece at a given position");
+                System.out.println("\thelp - View possible commands");
+            }
+        }
+    }
+
+    private void xx_gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
         if (team == BLACK) {
             this.printBoardWhite(new ChessGame());
             System.out.print("\n");
