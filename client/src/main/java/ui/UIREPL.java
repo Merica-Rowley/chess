@@ -5,21 +5,32 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
 
-public class UIREPL {
+public class UIREPL implements GameHandler {
     private final ServerFacade facade;
+    WebSocketFacade wsFacade;
 
-    public UIREPL(int port) {
+    public UIREPL(int port) throws DeploymentException, IOException, URISyntaxException {
         this.facade = new ServerFacade(port);
+        this.wsFacade = new WebSocketFacade(port, this);
     }
 
     public void run() throws URISyntaxException, IOException {
         this.preLogin();
+    }
+
+    public void updateGame(ChessGame game) {
+
+    }
+
+    public void printMessage(String message) {
+        System.out.println(message);
     }
 
     private void preLogin() throws URISyntaxException, IOException {
@@ -146,6 +157,13 @@ public class UIREPL {
     }
 
     private void gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
+        if (team == BLACK) {
+            this.printBoardBlack(new ChessGame());
+        } else { // WHITE or observer
+            this.printBoardWhite(new ChessGame());
+        }
+        System.out.print("\u001b[39;49m"); // Set text back to default
+
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
             Scanner scanner = new Scanner(System.in);
@@ -153,21 +171,26 @@ public class UIREPL {
             var input = line.split(" ");
 
             if (input[0].equals("redraw")) {
-                System.out.println("redrawing");
+                if (team == BLACK) {
+                    this.printBoardBlack(new ChessGame());
+                } else { // WHITE or observer
+                    this.printBoardWhite(new ChessGame());
+                }
+                System.out.print("\u001b[39;49m"); // Set text back to default
             } else if (input[0].equals("leave")) {
                 System.out.println("leaving");
             } else if (input[0].equals("move")) {
                 System.out.println("moving");
             } else if (input[0].equals("resign")) {
                 System.out.println("resigning");
-            } else if (input[0].equals("show moves")) {
+            } else if (input[0].equals("show_moves")) {
                 System.out.println("showing moves");
             } else { // Default case called with "help" or any other input
                 System.out.println("\tredraw - Redraw the chess board");
                 System.out.println("\tleave - Leave the game");
                 System.out.println("\tmove <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN> - Move the piece from a starting position to a different position");
                 System.out.println("\tresign - Forfeit and end the game");
-                System.out.println("\tshow moves <ROW> <COLUMN> - Show the legal moves for a piece at a given position");
+                System.out.println("\tshow_moves <ROW> <COLUMN> - Show the legal moves for a piece at a given position");
                 System.out.println("\thelp - View possible commands");
             }
         }
@@ -183,9 +206,9 @@ public class UIREPL {
             System.out.print("\n");
             this.printBoardWhite(new ChessGame());
         }
-        // For testing purposes
+
         System.out.print("\u001b[39;49m"); // Set text back to default
-        this.postLogin();
+        this.postLogin(); // For testing purposes
     }
 
     private void printBoardWhite(ChessGame chessGame) {
