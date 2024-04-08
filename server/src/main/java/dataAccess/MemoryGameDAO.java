@@ -53,6 +53,13 @@ public class MemoryGameDAO implements GameDAO {
         storage.put(gameID, updatedGame);
     }
 
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        if (!storage.containsKey(gameID)) throw new NoGameFoundException("Error: No game found with gameID");
+        GameData gameToUpdate = storage.get(gameID);
+        GameData updatedGame = new GameData(gameID, gameToUpdate.whiteUsername(), gameToUpdate.blackUsername(), gameToUpdate.gameName(), game);
+        storage.put(gameID, updatedGame);
+    }
+
     public void deleteAllGames() {
         storage.clear();
     }

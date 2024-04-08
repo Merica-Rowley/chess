@@ -84,6 +84,14 @@ public class DBGameDAO implements GameDAO {
         executeUpdate(statement, blackUsername, gameID);
     }
 
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        configureDatabase();
+        if (this.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
+        String gameJson = new Gson().toJson(game);
+        var statement = "UPDATE GameData SET game=? WHERE gameID=?";
+        executeUpdate(statement, gameJson, gameID);
+    }
+
     public void deleteAllGames() throws DataAccessException {
         configureDatabase();
         var statement = "TRUNCATE GameData";

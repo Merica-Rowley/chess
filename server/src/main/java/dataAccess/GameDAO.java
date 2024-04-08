@@ -17,6 +17,7 @@ public interface GameDAO {
     // update
     public void setWhiteUsername(int gameID, String whiteUsername) throws DataAccessException;
     public void setBlackUsername(int gameID, String blackUsername) throws DataAccessException;
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException;
 
     // delete
     public void deleteAllGames() throws DataAccessException;
