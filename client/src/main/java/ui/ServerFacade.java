@@ -241,4 +241,8 @@ public class ServerFacade {
                 }
         }
     }
+
+    public String getAuthToken() {
+        return authToken;
+    }
 }

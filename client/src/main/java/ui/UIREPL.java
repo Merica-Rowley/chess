@@ -196,21 +196,6 @@ public class UIREPL implements GameHandler {
         }
     }
 
-    private void xx_gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
-        if (team == BLACK) {
-            this.printBoardWhite(new ChessGame());
-            System.out.print("\n");
-            this.printBoardBlack(new ChessGame());
-        } else { // WHITE or observer
-            this.printBoardBlack(new ChessGame());
-            System.out.print("\n");
-            this.printBoardWhite(new ChessGame());
-        }
-
-        System.out.print("\u001b[39;49m"); // Set text back to default
-        this.postLogin(); // For testing purposes
-    }
-
     private void printBoardWhite(ChessGame chessGame) {
         ChessBoard board = chessGame.getBoard();
         board.resetBoard(); // Sets the board to an initial set up

@@ -8,20 +8,16 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import javax.websocket.*;
 
 public class WebSocketHandler {
+    WebSocketSessions sessions;
+    
     @OnWebSocketConnect
-    public void onConnect(Session session) {
-
-    }
+    public void onConnect(Session session) {}
 
     @OnWebSocketClose
-    public void onClose(Session session) {
-
-    }
+    public void onClose(Session session) {}
 
     @OnWebSocketError
-    public void onError(Throwable throwable) {
-
-    }
+    public void onError(Throwable throwable) {}
 
     @OnWebSocketMessage
     public void onMessage(Session session, String string) {

@@ -14,12 +14,16 @@ import static java.lang.String.format;
 
 public class WebSocketFacade extends Endpoint{
     public Session session;
+    private final int port;
     GameHandler gameHandler;
 
-    public WebSocketFacade(int port, GameHandler gameHandler) throws DeploymentException, IOException, URISyntaxException {
+    public WebSocketFacade(int port, GameHandler gameHandler){
+        this.port = port;
         this.gameHandler = gameHandler;
+    }
 
-        URI uri = new URI(format("ws://localhost:" + port + "/connect"));
+    public void connect() throws URISyntaxException, DeploymentException, IOException {
+        URI uri = new URI(format("ws://localhost:" + this.port + "/connect"));
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 
@@ -31,15 +35,10 @@ public class WebSocketFacade extends Endpoint{
                 gameHandler.printMessage(message);
             }
         });
-
     }
 
-    public void connect() {
-
-    }
-
-    public void disconnect() {
-
+    public void disconnect() throws IOException {
+        this.session.close();
     }
 
     // Outgoing messages
