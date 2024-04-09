@@ -6,12 +6,12 @@ import model.AuthData;
 
 import org.eclipse.jetty.websocket.api.Session;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketSessions {
-    Map<Integer, Map<AuthData, Session>> sessionMap = new HashMap<>();
-    DBAuthDAO authDAO = new DBAuthDAO();
+    Map<Integer, Map<AuthData, Session>> sessionMap = new ConcurrentHashMap<>();
+    private final DBAuthDAO authDAO = new DBAuthDAO();
 
     public void addSessionToGame(int gameID, String authToken, Session session) throws DataAccessException {
         AuthData authData = authDAO.getAuthData(authToken);
@@ -19,7 +19,7 @@ public class WebSocketSessions {
             Map<AuthData, Session> innerMap = sessionMap.get(gameID);
             innerMap.put(authData, session);
         } else {
-            Map<AuthData, Session> dataMap = new HashMap<>();
+            Map<AuthData, Session> dataMap = new ConcurrentHashMap<>();
             dataMap.put(authData, session);
             sessionMap.put(gameID, dataMap);
         }

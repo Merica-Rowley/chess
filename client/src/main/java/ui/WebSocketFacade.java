@@ -40,7 +40,10 @@ public class WebSocketFacade extends Endpoint{
                 ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                 switch (serverMessage.getServerMessageType()) {
                     case NOTIFICATION, ERROR -> gameHandler.printMessage(message);
-                    case LOAD_GAME -> gameHandler.updateGame(new ChessGame()); // TODO not a fresh chess game
+                    case LOAD_GAME -> {
+                        LoadGame loadGame = gson.fromJson(message, LoadGame.class);
+                        gameHandler.updateGame(loadGame.getGame());
+                    }
                 }
             }
         });

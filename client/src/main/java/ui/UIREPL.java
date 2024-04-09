@@ -15,6 +15,7 @@ import static chess.ChessGame.TeamColor.BLACK;
 public class UIREPL implements GameHandler {
     private final int port;
     private ChessGame.TeamColor teamColor = null;
+    private ChessGame upToDateGame = null;
     private final ServerFacade facade;
     private WebSocketFacade wsFacade;
 
@@ -35,14 +36,15 @@ public class UIREPL implements GameHandler {
     }
 
     public void updateGame(ChessGame game) {
+        upToDateGame = game;
+        System.out.println();
         if (this.teamColor == BLACK) {
-            System.out.println();
             this.printBoardBlack(game);
         } else {
             // For both white team and observers
-            System.out.println();
             this.printBoardWhite(game);
         }
+        System.out.print("[GAMEPLAY] >>> ");
     }
 
     public void printMessage(String message) {
@@ -176,21 +178,6 @@ public class UIREPL implements GameHandler {
     }
 
     private void gameplay(int gameID, ChessGame.TeamColor team) throws URISyntaxException, IOException {
-//        if (team == BLACK) {
-//            this.printBoardBlack(new ChessGame());
-//        } else { // WHITE or observer
-//            this.printBoardWhite(new ChessGame());
-//        }
-//        System.out.print("\u001b[39;49m"); // Set text back to default
-
-
-//        try {
-//            WebSocketFacade wsFacade = new WebSocketFacade(port, this);
-//            wsFacade.connect();
-//        } catch (DeploymentException e) {
-//            throw new RuntimeException(e);
-//        }
-
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
             Scanner scanner = new Scanner(System.in);
@@ -199,9 +186,9 @@ public class UIREPL implements GameHandler {
 
             if (input[0].equals("redraw")) {
                 if (team == BLACK) {
-                    this.printBoardBlack(new ChessGame()); // TODO: make this print the specific game, not just a new one
+                    this.printBoardBlack(this.upToDateGame);
                 } else { // WHITE or observer
-                    this.printBoardWhite(new ChessGame());
+                    this.printBoardWhite(this.upToDateGame);
                 }
                 System.out.print("\u001b[39;49m"); // Set text back to default
             } else if (input[0].equals("leave")) {
@@ -244,6 +231,8 @@ public class UIREPL implements GameHandler {
                 System.out.print("\u001b[30;49m\n");
             }
         }
+
+        System.out.print("\u001b[39;49m"); // Set text back to default
     }
 
     private void printBoardBlack(ChessGame chessGame) {
@@ -267,6 +256,8 @@ public class UIREPL implements GameHandler {
                 System.out.print("\u001b[30;49m\n");
             }
         }
+
+        System.out.print("\u001b[39;49m"); // Set text back to default
     }
 
     private void printPiece(ChessPiece piece, boolean lightSpace) {

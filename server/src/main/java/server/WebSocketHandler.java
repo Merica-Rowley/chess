@@ -8,15 +8,23 @@ import model.AuthData;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.Session;
 import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.lang.String.format;
 
 @WebSocket
 public class WebSocketHandler {
-    WebSocketSessions sessions = new WebSocketSessions();
+    public WebSocketSessions sessions;
     private final GameDAO gameDAO = new DBGameDAO();
+
+    WebSocketHandler() {
+        this.sessions = new WebSocketSessions();
+    }
 
 //    @OnWebSocketConnect
 //    public void onConnect(Session session) {}
@@ -51,7 +59,9 @@ public class WebSocketHandler {
         JoinPlayer command = gson.fromJson(message, JoinPlayer.class);
         sessions.addSessionToGame(command.getGameID(), command.getAuthString(), session);
         String sendThis = gson.toJson(new LoadGame(gameDAO.getGameData(command.getGameID()).game()));
-        this.sendMessage(command.getGameID(), sendThis, command.getAuthString());
+        String userName = this.sendMessage(command.getGameID(), sendThis, command.getAuthString());
+        String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as " + command.getPlayerColor() + "\n")));
+        broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
     }
 
     private void joinObserver(Session session, String message) throws DataAccessException {
@@ -59,7 +69,9 @@ public class WebSocketHandler {
         JoinObserver command = gson.fromJson(message, JoinObserver.class);
         sessions.addSessionToGame(command.getGameID(), command.getAuthString(), session);
         String sendThis = gson.toJson(new LoadGame(gameDAO.getGameData(command.getGameID()).game()));
-        this.sendMessage(command.getGameID(), sendThis, command.getAuthString());
+        String userName = this.sendMessage(command.getGameID(), sendThis, command.getAuthString());
+        String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as an observer\n")));
+        broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
     }
 
     private void makeMove(String message) {
@@ -77,13 +89,12 @@ public class WebSocketHandler {
         UserGameCommand command = gson.fromJson(message, Resign.class);
     }
 
-
-    private void sendMessage(int gameID, String message, String authToken) {
+    private String sendMessage(int gameID, String message, String authToken) {
         Map<AuthData, Session> sessionsList = sessions.getSessionsForGame(gameID);
         Session session = null;
-        String userName;
+        String userName = null;
         for (var connection : sessionsList.keySet()) {
-            if (connection.authToken() == authToken) {
+            if (Objects.equals(connection.authToken(), authToken)) {
                 session = sessionsList.get(connection);
                 userName = connection.username();
             }
@@ -94,9 +105,22 @@ public class WebSocketHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return userName;
     }
 
     private void broadcastMessage(int gameID, String message, String exceptThisAuthToken) {
-
+        Map<AuthData, Session> sessionsList = sessions.getSessionsForGame(gameID);
+        Session session = null;
+        for (var connection : sessionsList.keySet()) {
+            if (!Objects.equals(connection.authToken(), exceptThisAuthToken)) {
+                session = sessionsList.get(connection);
+                try {
+                    assert session != null;
+                    session.getRemote().sendString(message);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 }

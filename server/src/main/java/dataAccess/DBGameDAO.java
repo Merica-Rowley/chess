@@ -21,6 +21,7 @@ public class DBGameDAO implements GameDAO {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
         String gameName = game.gameName();
+        game.game().getBoard().resetBoard(); // Sets newly created game to fresh board
         String gameJson = new Gson().toJson(game.game());
         return executeUpdate(statement, whiteUsername, blackUsername, gameName, gameJson);
     }

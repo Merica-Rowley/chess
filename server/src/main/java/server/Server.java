@@ -8,7 +8,9 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        Spark.webSocket("/connect", WebSocketHandler.class);
+        WebSocketHandler wsHandler = new WebSocketHandler();
+//        Spark.webSocket("/connect", WebSocketHandler.class);
+        Spark.webSocket("/connect", wsHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.init();
