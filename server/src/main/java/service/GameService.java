@@ -62,14 +62,6 @@ public class GameService {
     }
 
     // -------------------- Added for Phase 6 --------------------
-    public void joinPlayer() {
-
-    }
-
-    public void joinObserver() {
-
-    }
-
     public void makeMove() {
 
     }

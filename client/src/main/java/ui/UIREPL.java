@@ -15,10 +15,18 @@ import static chess.ChessGame.TeamColor.BLACK;
 public class UIREPL implements GameHandler {
     private final int port;
     private final ServerFacade facade;
+    private WebSocketFacade wsFacade;
 
     public UIREPL(int port) throws DeploymentException, IOException, URISyntaxException {
         this.facade = new ServerFacade(port);
         this.port = port;
+
+        try {
+            wsFacade = new WebSocketFacade(port, this);
+            wsFacade.connect();
+        } catch (DeploymentException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void run() throws URISyntaxException, IOException {
@@ -26,7 +34,7 @@ public class UIREPL implements GameHandler {
     }
 
     public void updateGame(ChessGame game) {
-
+        System.out.println("CALLED UPDATEGAME");
     }
 
     public void printMessage(String message) {
@@ -129,6 +137,7 @@ public class UIREPL implements GameHandler {
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
+                        this.wsFacade.joinObserver(this.facade.getAuthToken(), gameID); // FIXME: make sure this works
                         this.gameplay(gameID, null);
                         break;
                     }
@@ -165,12 +174,14 @@ public class UIREPL implements GameHandler {
 //            this.printBoardWhite(new ChessGame());
 //        }
 //        System.out.print("\u001b[39;49m"); // Set text back to default
-        try {
-            WebSocketFacade wsFacade = new WebSocketFacade(port, this);
-            wsFacade.connect();
-        } catch (DeploymentException e) {
-            throw new RuntimeException(e);
-        }
+
+
+//        try {
+//            WebSocketFacade wsFacade = new WebSocketFacade(port, this);
+//            wsFacade.connect();
+//        } catch (DeploymentException e) {
+//            throw new RuntimeException(e);
+//        }
 
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
@@ -180,7 +191,7 @@ public class UIREPL implements GameHandler {
 
             if (input[0].equals("redraw")) {
                 if (team == BLACK) {
-                    this.printBoardBlack(new ChessGame());
+                    this.printBoardBlack(new ChessGame()); // TODO: make this print the specific game, not just a new one
                 } else { // WHITE or observer
                     this.printBoardWhite(new ChessGame());
                 }

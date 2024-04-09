@@ -3,6 +3,8 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
@@ -17,7 +19,7 @@ public class WebSocketFacade extends Endpoint{
     private final int port;
     GameHandler gameHandler;
 
-    public WebSocketFacade(int port, GameHandler gameHandler){
+    public WebSocketFacade(int port, GameHandler gameHandler) throws DeploymentException, URISyntaxException, IOException {
         this.port = port;
         this.gameHandler = gameHandler;
     }
@@ -31,8 +33,15 @@ public class WebSocketFacade extends Endpoint{
             // Process incoming messages
             // 1. Deserialize the message
             // 2. Call gameHandler to process message
+            @Override
+            @OnMessage
             public void onMessage(String message) {
-                gameHandler.printMessage(message);
+                Gson gson = new Gson();
+                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                switch (serverMessage.getServerMessageType()) {
+                    case NOTIFICATION, ERROR -> gameHandler.printMessage(message);
+                    case LOAD_GAME -> gameHandler.updateGame(new ChessGame()); // TODO not a fresh chess game
+                }
             }
         });
     }
@@ -70,16 +79,19 @@ public class WebSocketFacade extends Endpoint{
     }
 
     @Override
+    @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
-
-    @Override
-    public void onClose(Session session, CloseReason closeReason) {
-        super.onClose(session, closeReason);
-    }
-
-    @Override
-    public void onError(Session session, Throwable thr) {
-        super.onError(session, thr);
-    }
+//
+//    @Override
+//    @OnClose
+//    public void onClose(Session session, CloseReason closeReason) {
+//        super.onClose(session, closeReason);
+//    }
+//
+//    @Override
+//    @OnError
+//    public void onError(Session session, Throwable thr) {
+//        super.onError(session, thr);
+//    }
 }
