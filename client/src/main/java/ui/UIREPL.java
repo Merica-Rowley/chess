@@ -14,6 +14,7 @@ import static chess.ChessGame.TeamColor.BLACK;
 
 public class UIREPL implements GameHandler {
     private final int port;
+    private ChessGame.TeamColor teamColor = null;
     private final ServerFacade facade;
     private WebSocketFacade wsFacade;
 
@@ -34,7 +35,14 @@ public class UIREPL implements GameHandler {
     }
 
     public void updateGame(ChessGame game) {
-        System.out.println("CALLED UPDATEGAME");
+        if (this.teamColor == BLACK) {
+            System.out.println();
+            this.printBoardBlack(game);
+        } else {
+            // For both white team and observers
+            System.out.println();
+            this.printBoardWhite(game);
+        }
     }
 
     public void printMessage(String message) {
@@ -109,19 +117,19 @@ public class UIREPL implements GameHandler {
                 try {
                     // This would be true if a game id was included but not a team (in other words, the player will be an observer)
                     String response;
-                    ChessGame.TeamColor team;
                     if (input.length == 2) {
-                        team = null;
+                        this.teamColor = null;
                     } else {
-                        team = ChessGame.TeamColor.valueOf(input[2]);
+                        this.teamColor = ChessGame.TeamColor.valueOf(input[2]);
                     }
                     int gameID = Integer.parseInt(input[1]);
-                    response = facade.joinGame(gameID, team);
+                    response = facade.joinGame(gameID, this.teamColor);
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.gameplay(gameID, team);
+                        this.wsFacade.joinPlayer(facade.getAuthToken(), gameID, this.teamColor);
+                        this.gameplay(gameID, this.teamColor);
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -137,7 +145,7 @@ public class UIREPL implements GameHandler {
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.wsFacade.joinObserver(this.facade.getAuthToken(), gameID); // FIXME: make sure this works
+                        this.wsFacade.joinObserver(this.facade.getAuthToken(), gameID);
                         this.gameplay(gameID, null);
                         break;
                     }
