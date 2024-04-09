@@ -13,12 +13,12 @@ import java.util.Scanner;
 import static chess.ChessGame.TeamColor.BLACK;
 
 public class UIREPL implements GameHandler {
+    private final int port;
     private final ServerFacade facade;
-    WebSocketFacade wsFacade;
 
     public UIREPL(int port) throws DeploymentException, IOException, URISyntaxException {
         this.facade = new ServerFacade(port);
-        this.wsFacade = new WebSocketFacade(port, this);
+        this.port = port;
     }
 
     public void run() throws URISyntaxException, IOException {
@@ -107,12 +107,13 @@ public class UIREPL implements GameHandler {
                     } else {
                         team = ChessGame.TeamColor.valueOf(input[2]);
                     }
-                    response = facade.joinGame(Integer.parseInt(input[1]), team);
+                    int gameID = Integer.parseInt(input[1]);
+                    response = facade.joinGame(gameID, team);
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.gameplay(team);
+                        this.gameplay(gameID, team);
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -122,12 +123,13 @@ public class UIREPL implements GameHandler {
                 }
             } else if (input[0].equals("observe")) {
                 try {
-                    String response = facade.joinGame(Integer.parseInt(input[1]), null);
+                    int gameID = Integer.parseInt(input[1]);
+                    String response = facade.joinGame(gameID, null);
                     System.out.println(response);
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
-                        this.gameplay(null);
+                        this.gameplay(gameID, null);
                         break;
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -156,13 +158,19 @@ public class UIREPL implements GameHandler {
         }
     }
 
-    private void gameplay(ChessGame.TeamColor team) throws URISyntaxException, IOException {
-        if (team == BLACK) {
-            this.printBoardBlack(new ChessGame());
-        } else { // WHITE or observer
-            this.printBoardWhite(new ChessGame());
+    private void gameplay(int gameID, ChessGame.TeamColor team) throws URISyntaxException, IOException {
+//        if (team == BLACK) {
+//            this.printBoardBlack(new ChessGame());
+//        } else { // WHITE or observer
+//            this.printBoardWhite(new ChessGame());
+//        }
+//        System.out.print("\u001b[39;49m"); // Set text back to default
+        try {
+            WebSocketFacade wsFacade = new WebSocketFacade(port, this);
+            wsFacade.connect();
+        } catch (DeploymentException e) {
+            throw new RuntimeException(e);
         }
-        System.out.print("\u001b[39;49m"); // Set text back to default
 
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
