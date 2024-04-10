@@ -299,25 +299,7 @@ public class UIREPL implements GameHandler {
                 System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
                 for (int col = 0; col < 10; col++) {
-                    if ((col == 0) || (col == 9)) {
-                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
-                    } else {
-                        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                        boolean lightSpace = ((row + col) % 2 != 0);
-                        boolean moveIsValid = false;
-
-                        if (possibleMoves != null) {
-                            if (possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), null)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.QUEEN)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.BISHOP)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.KNIGHT)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.ROOK))) {
-                                moveIsValid = true;
-                            }
-                        }
-
-                        this.printPiece(piece, lightSpace, moveIsValid);
-                    }
+                    printSquare(position, board, possibleMoves, col, row);
                 }
                 System.out.print("\u001b[30;49m\n");
             }
@@ -339,31 +321,35 @@ public class UIREPL implements GameHandler {
                 System.out.println("\u001b[30;104m" + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + "\u001b[30;49m");
             } else {
                 for (int col = 9; col >= 0; col--) {
-                    if ((col == 0) || (col == 9)) {
-                        System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
-                    } else {
-                        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                        boolean lightSpace = ((row + col) % 2 != 0);
-                        boolean moveIsValid = false;
-
-                        if (possibleMoves != null) {
-                            if (possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), null)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.QUEEN)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.BISHOP)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.KNIGHT)) ||
-                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.ROOK))) {
-                                moveIsValid = true;
-                            }
-                        }
-
-                        this.printPiece(piece, lightSpace, moveIsValid);
-                    }
+                    printSquare(position, board, possibleMoves, col, row);
                 }
                 System.out.print("\u001b[30;49m\n");
             }
         }
 
         System.out.print("\u001b[39;49m"); // Set text back to default
+    }
+
+    private void printSquare(ChessPosition position, ChessBoard board, Collection<ChessMove> possibleMoves, int col, int row) {
+        if ((col == 0) || (col == 9)) {
+            System.out.printf("\u001b[30;104m %d \u001b[30;49m", (row));
+        } else {
+            ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+            boolean lightSpace = ((row + col) % 2 != 0);
+            boolean moveIsValid = false;
+
+            if (possibleMoves != null) {
+                if (possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), null)) ||
+                        possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.QUEEN)) ||
+                        possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.BISHOP)) ||
+                        possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.KNIGHT)) ||
+                        possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.ROOK))) {
+                    moveIsValid = true;
+                }
+            }
+
+            this.printPiece(piece, lightSpace, moveIsValid);
+        }
     }
 
     private void printPiece(ChessPiece piece, boolean lightSpace, boolean moveSpace) {

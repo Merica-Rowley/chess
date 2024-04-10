@@ -40,10 +40,6 @@ public class WebSocketSessions {
         }
     }
 
-//    public void removeSession(Session session) {
-//        // TODO: what does this do
-//    }
-
     public Map<AuthData, Session> getSessionsForGame(int gameID) {
         return sessionMap.get(gameID);
     }
