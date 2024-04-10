@@ -5,6 +5,7 @@ import chess.*;
 import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -33,16 +34,12 @@ public class UIREPL implements GameHandler {
 
     public void updateGame(ChessGame game) {
         upToDateGame = game;
-        System.out.println("__________");
-        System.out.println("Game: \n");
-        System.out.println(game.getBoard().toString());
-        System.out.println("__________");
         System.out.println();
         if (this.teamColor == BLACK) {
-            this.printBoardBlack(game);
+            this.printBoardBlack(null);
         } else {
             // For both white team and observers
-            this.printBoardWhite(game);
+            this.printBoardWhite(null);
         }
         System.out.print("[GAMEPLAY] >>> ");
     }
@@ -193,14 +190,15 @@ public class UIREPL implements GameHandler {
 
             if (input[0].equals("redraw")) {
                 if (team == BLACK) {
-                    this.printBoardBlack(this.upToDateGame);
+                    this.printBoardBlack(null);
                 } else { // WHITE or observer
-                    this.printBoardWhite(this.upToDateGame);
+                    this.printBoardWhite(null);
                 }
                 System.out.print("\u001b[39;49m"); // Set text back to default
             } else if (input[0].equals("leave")) {
                 wsFacade.leaveGame(facade.getAuthToken(), gameID);
                 this.postLogin();
+                break;
             } else if (input[0].equals("move")) {
                 if (input.length < 5) {
                     System.out.println("Invalid syntax; Please enter in format move <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN>");
@@ -227,9 +225,22 @@ public class UIREPL implements GameHandler {
                     }
                 }
             } else if (input[0].equals("resign")) {
-                System.out.println("resigning");
+                wsFacade.resignGame(facade.getAuthToken(), gameID);
             } else if (input[0].equals("show_moves")) {
-                System.out.println("showing moves");
+                if (input.length < 3) {
+                    System.out.println("Invalid syntax; Please enter in format show_moves <ROW> <COLUMN>");
+                } else {
+                    try {
+                        ChessPosition position = new ChessPosition(letterToNumberConversion(input[1]), letterToNumberConversion(input[2]));
+                        if (teamColor == ChessGame.TeamColor.BLACK) {
+                            this.printBoardBlack(position);
+                        } else {
+                            this.printBoardWhite(position);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter valid coordinates");
+                    }
+                }
             } else { // Default case called with "help" or any other input
                 System.out.println("\tredraw - Redraw the chess board");
                 System.out.println("\tleave - Leave the game");
@@ -275,9 +286,12 @@ public class UIREPL implements GameHandler {
         }
     }
 
-    private void printBoardWhite(ChessGame chessGame) {
-        ChessBoard board = chessGame.getBoard();
-        board.resetBoard(); // Sets the board to an initial set up
+    private void printBoardWhite(ChessPosition position) {
+        ChessBoard board = this.upToDateGame.getBoard();
+        Collection<ChessMove> possibleMoves = null;
+        if (position != null) {
+            possibleMoves = this.upToDateGame.validMoves(position);
+        }
 
         // Orientation with white at the bottom
         for (int row = 9; row >= 0; row--) {
@@ -290,7 +304,19 @@ public class UIREPL implements GameHandler {
                     } else {
                         ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                         boolean lightSpace = ((row + col) % 2 != 0);
-                        this.printPiece(piece, lightSpace);
+                        boolean moveIsValid = false;
+
+                        if (possibleMoves != null) {
+                            if (possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), null)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.QUEEN)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.BISHOP)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.KNIGHT)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.ROOK))) {
+                                moveIsValid = true;
+                            }
+                        }
+
+                        this.printPiece(piece, lightSpace, moveIsValid);
                     }
                 }
                 System.out.print("\u001b[30;49m\n");
@@ -300,9 +326,12 @@ public class UIREPL implements GameHandler {
         System.out.print("\u001b[39;49m"); // Set text back to default
     }
 
-    private void printBoardBlack(ChessGame chessGame) {
-        ChessBoard board = chessGame.getBoard();
-        board.resetBoard(); // Sets the board to an initial set up
+    private void printBoardBlack(ChessPosition position) {
+        ChessBoard board = this.upToDateGame.getBoard();
+        Collection<ChessMove> possibleMoves = null;
+        if (position != null) {
+            possibleMoves = this.upToDateGame.validMoves(position);
+        }
 
         // Orientation with black at the bottom
         for (int row = 0; row < 10; row++) {
@@ -315,7 +344,19 @@ public class UIREPL implements GameHandler {
                     } else {
                         ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                         boolean lightSpace = ((row + col) % 2 != 0);
-                        this.printPiece(piece, lightSpace);
+                        boolean moveIsValid = false;
+
+                        if (possibleMoves != null) {
+                            if (possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), null)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.QUEEN)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.BISHOP)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.KNIGHT)) ||
+                                    possibleMoves.contains(new ChessMove(position, new ChessPosition(row, col), ChessPiece.PieceType.ROOK))) {
+                                moveIsValid = true;
+                            }
+                        }
+
+                        this.printPiece(piece, lightSpace, moveIsValid);
                     }
                 }
                 System.out.print("\u001b[30;49m\n");
@@ -325,11 +366,19 @@ public class UIREPL implements GameHandler {
         System.out.print("\u001b[39;49m"); // Set text back to default
     }
 
-    private void printPiece(ChessPiece piece, boolean lightSpace) {
+    private void printPiece(ChessPiece piece, boolean lightSpace, boolean moveSpace) {
         if (lightSpace) {
-            System.out.print("\u001b[97;47m");
+            if (moveSpace) {
+                System.out.print("\u001b[97;102m");
+            } else {
+                System.out.print("\u001b[97;47m");
+            }
         } else {
-            System.out.print("\u001b[97;100m");
+            if (moveSpace) {
+                System.out.print("\u001b[97;42m");
+            } else {
+                System.out.print("\u001b[97;100m");
+            }
         }
 
         if (piece != null) {

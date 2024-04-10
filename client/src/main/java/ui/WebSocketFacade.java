@@ -3,11 +3,8 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import org.glassfish.grizzly.http.Note;
+import webSocketMessages.serverMessages.*;
 import webSocketMessages.serverMessages.Error;
-import webSocketMessages.serverMessages.LoadGame;
-import webSocketMessages.serverMessages.Notification;
-import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
@@ -80,6 +77,7 @@ public class WebSocketFacade extends Endpoint{
 
     public void leaveGame(String authToken, int gameID) throws IOException {
         this.sendMessage(new Leave(authToken, gameID));
+        this.disconnect();
     }
 
     public void resignGame(String authToken, int gameID) throws IOException {
@@ -95,16 +93,4 @@ public class WebSocketFacade extends Endpoint{
     @OnOpen
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
-//
-//    @Override
-//    @OnClose
-//    public void onClose(Session session, CloseReason closeReason) {
-//        super.onClose(session, closeReason);
-//    }
-//
-//    @Override
-//    @OnError
-//    public void onError(Session session, Throwable thr) {
-//        super.onError(session, thr);
-//    }
 }
