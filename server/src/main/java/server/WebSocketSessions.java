@@ -2,6 +2,7 @@ package server;
 
 import dataAccess.DBAuthDAO;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.UserNotFoundException;
 import model.AuthData;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -15,6 +16,11 @@ public class WebSocketSessions {
 
     public void addSessionToGame(int gameID, String authToken, Session session) throws DataAccessException {
         AuthData authData = authDAO.getAuthData(authToken);
+
+        if (authData == null) {
+            throw new UserNotFoundException("Error: bad auth token");
+        }
+
         if (sessionMap.containsKey(gameID)) {
             Map<AuthData, Session> innerMap = sessionMap.get(gameID);
             innerMap.put(authData, session);
