@@ -131,6 +131,10 @@ public class WebSocketHandler {
             int gameID = currentGameData.gameID();
             ChessGame game = currentGameData.game();
 
+            if (game.getTeamTurn() == ChessGame.TeamColor.GAME_OVER) {
+                throw new DataAccessException("Error: Game Over");
+            }
+
             if (game.isInCheckmate(ChessGame.TeamColor.BLACK) ||
                     game.isInCheckmate(ChessGame.TeamColor.WHITE) ||
                     game.isInStalemate(ChessGame.TeamColor.BLACK) ||
@@ -198,7 +202,31 @@ public class WebSocketHandler {
         Gson gson = new Gson();
         Resign command = gson.fromJson(message, Resign.class);
         try {
-            throw new DataAccessException("not implemented");
+            GameData currentGameData = gameDAO.getGameData(command.getGameID());
+
+            if (currentGameData == null) {
+                throw new NoGameFoundException("Error: No game found");
+            }
+
+            int gameID = currentGameData.gameID();
+            String userName = this.getUsername(command.getGameID(), command.getAuthString());
+
+            if (this.getTeamColor(gameID, userName) == null) {
+                throw new DataAccessException("Error: Observers can't resign; try leaving the game instead");
+            }
+
+            ChessGame game = currentGameData.game();
+
+            if (game.getTeamTurn() == ChessGame.TeamColor.GAME_OVER) {
+                throw new DataAccessException("Error: The game is already over");
+            }
+
+            game.setTeamTurn(ChessGame.TeamColor.GAME_OVER); // setting the team turn to null prevents future moves from being made
+            gameDAO.updateGame(gameID, game);
+
+            String sendThis = gson.toJson(new Notification(format(userName + " resigned from the game\n")));
+            this.sendMessage(session, sendThis);
+            this.broadcastMessage(command.getGameID(), sendThis, command.getAuthString());
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
             this.sendMessage(session, errorObjectString);
