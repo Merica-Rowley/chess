@@ -150,6 +150,16 @@ public class WebSocketHandler {
                     move.getStartPosition() + " to " + move.getEndPosition())));
             this.broadcastMessage(command.getGameID(), sendGameLoad, command.getAuthString());
             this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
+
+            if (game.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                String broadcastEndGame = gson.toJson(new Notification("WHITE won the game"));
+                this.broadcastMessage(command.getGameID(), broadcastEndGame, command.getAuthString());
+            } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInStalemate(ChessGame.TeamColor.WHITE)){
+                String broadcastEndGame = gson.toJson(new Notification("BLACK won the game"));
+                this.broadcastMessage(command.getGameID(), broadcastEndGame, command.getAuthString());
+            }
+
         } catch (DataAccessException  | InvalidMoveException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
             this.sendMessage(session, errorObjectString);
