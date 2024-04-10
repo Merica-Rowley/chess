@@ -8,19 +8,17 @@ import dataAccess.DBGameDAO;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NoGameFoundException;
 import dataAccess.Exceptions.TeamTakenException;
-import dataAccess.Exceptions.UserNotFoundException;
 import dataAccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.Session;
-import service.GameService;
+
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -35,15 +33,6 @@ public class WebSocketHandler {
     WebSocketHandler() {
         this.sessions = new WebSocketSessions();
     }
-
-//    @OnWebSocketConnect
-//    public void onConnect(Session session) {}
-//
-//    @OnWebSocketClose
-//    public void onClose(Session session) {}
-//
-//    @OnWebSocketError
-//    public void onError(Throwable throwable) {}
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
@@ -86,7 +75,7 @@ public class WebSocketHandler {
 
             String sendThis = gson.toJson(new LoadGame(currentGameData.game()));
             this.sendMessage(session, sendThis);
-            String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as " + command.getPlayerColor() + "\n")));
+            String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as " + command.getPlayerColor())));
             this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
 
         } catch (DataAccessException e) {
@@ -111,7 +100,7 @@ public class WebSocketHandler {
 
             String sendThis = gson.toJson(new LoadGame(currentGameData.game()));
             this.sendMessage(session, sendThis);
-            String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as an observer\n")));
+            String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as an observer")));
             broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
@@ -158,7 +147,7 @@ public class WebSocketHandler {
             String sendGameLoad = gson.toJson(new LoadGame(currentGameData.game()));
             this.sendMessage(session, sendGameLoad);
             String broadcastThis = gson.toJson(new Notification(format(username + " made a move from " +
-                    move.getStartPosition() + " to " + move.getEndPosition() + "\n")));
+                    move.getStartPosition() + " to " + move.getEndPosition())));
             this.broadcastMessage(command.getGameID(), sendGameLoad, command.getAuthString());
             this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException  | InvalidMoveException e) {
@@ -188,7 +177,7 @@ public class WebSocketHandler {
             }
 
             sessions.removeSessionFromGame(gameID, command.getAuthString(), session);
-            String broadcastThis = gson.toJson(new Notification(format(userName + " left the game\n")));
+            String broadcastThis = gson.toJson(new Notification(format(userName + " left the game")));
             this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
@@ -224,7 +213,7 @@ public class WebSocketHandler {
             game.setTeamTurn(ChessGame.TeamColor.GAME_OVER); // setting the team turn to null prevents future moves from being made
             gameDAO.updateGame(gameID, game);
 
-            String sendThis = gson.toJson(new Notification(format(userName + " resigned from the game\n")));
+            String sendThis = gson.toJson(new Notification(format(userName + " resigned from the game")));
             this.sendMessage(session, sendThis);
             this.broadcastMessage(command.getGameID(), sendThis, command.getAuthString());
         } catch (DataAccessException e) {
