@@ -52,11 +52,7 @@ public class ServerFacade {
                     return format("Success! Registered with username: %s", response.username());
                 }
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
@@ -90,11 +86,7 @@ public class ServerFacade {
                     return format("Success! Logged in as: %s", response.username());
                 }
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
@@ -117,11 +109,7 @@ public class ServerFacade {
             case 200:
                 return "Success! Logged out";
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
@@ -156,11 +144,7 @@ public class ServerFacade {
                     return format("Success! Created game with id: %d", gameID);
                 }
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
@@ -200,11 +184,7 @@ public class ServerFacade {
                     return format(gameList);
                 }
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
@@ -234,15 +214,19 @@ public class ServerFacade {
             case 200:
                 return "Success! Joined game";
             default: // Catches all errors and displays the error message
-                try (InputStream errorBody = http.getErrorStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
-                    var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
-                    return errorMessage.message();
-                }
+                return errorHelperFunction(http);
         }
     }
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    private String errorHelperFunction(HttpURLConnection http) throws IOException {
+        try (InputStream errorBody = http.getErrorStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(errorBody);
+            var errorMessage = new Gson().fromJson(inputStreamReader, ResponseMessage.class);
+            return errorMessage.message();
+        }
     }
 }
