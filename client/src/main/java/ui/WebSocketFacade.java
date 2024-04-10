@@ -3,7 +3,10 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import org.glassfish.grizzly.http.Note;
+import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
@@ -39,7 +42,14 @@ public class WebSocketFacade extends Endpoint{
                 Gson gson = new Gson();
                 ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                 switch (serverMessage.getServerMessageType()) {
-                    case NOTIFICATION, ERROR -> gameHandler.printMessage(message);
+                    case NOTIFICATION -> {
+                        Notification notification = gson.fromJson(message, Notification.class);
+                        gameHandler.printMessage(notification.getMessage());
+                    }
+                    case ERROR -> {
+                        Error error = gson.fromJson(message, Error.class);
+                        gameHandler.printMessage(error.getErrorMessage());
+                    }
                     case LOAD_GAME -> {
                         LoadGame loadGame = gson.fromJson(message, LoadGame.class);
                         gameHandler.updateGame(loadGame.getGame());

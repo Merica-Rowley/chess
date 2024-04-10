@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import javax.websocket.DeploymentException;
 import java.io.IOException;
@@ -25,7 +22,6 @@ public class UIREPL implements GameHandler {
 
         try {
             wsFacade = new WebSocketFacade(port, this);
-            wsFacade.connect();
         } catch (DeploymentException e) {
             throw new RuntimeException(e);
         }
@@ -37,6 +33,10 @@ public class UIREPL implements GameHandler {
 
     public void updateGame(ChessGame game) {
         upToDateGame = game;
+        System.out.println("__________");
+        System.out.println("Game: \n");
+        System.out.println(game.getBoard().toString());
+        System.out.println("__________");
         System.out.println();
         if (this.teamColor == BLACK) {
             this.printBoardBlack(game);
@@ -49,6 +49,7 @@ public class UIREPL implements GameHandler {
 
     public void printMessage(String message) {
         System.out.println(message);
+        System.out.print("[GAMEPLAY] >>> ");
     }
 
     private void preLogin() throws URISyntaxException, IOException {
@@ -130,6 +131,7 @@ public class UIREPL implements GameHandler {
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
+                        wsFacade.connect();
                         this.wsFacade.joinPlayer(facade.getAuthToken(), gameID, this.teamColor);
                         this.gameplay(gameID, this.teamColor);
                         break;
@@ -138,6 +140,8 @@ public class UIREPL implements GameHandler {
                     System.out.println("Error: missing input\nPlease enter a game id.");
                 } catch (NumberFormatException e) {
                     System.out.println("Error: invalid game id\nPlease enter a valid game id.");
+                } catch (DeploymentException e) {
+                    throw new RuntimeException(e);
                 }
             } else if (input[0].equals("observe")) {
                 try {
@@ -147,6 +151,7 @@ public class UIREPL implements GameHandler {
                     if (response.contains("Error")) {
                         System.out.print("Enter 'help' to see a list of commands\n");
                     } else {
+                        wsFacade.connect();
                         this.wsFacade.joinObserver(this.facade.getAuthToken(), gameID);
                         this.gameplay(gameID, null);
                         break;
@@ -155,6 +160,8 @@ public class UIREPL implements GameHandler {
                     System.out.println("Error: missing input\nPlease enter a game id.");
                 } catch (NumberFormatException e) {
                     System.out.println("Error: invalid game id\nPlease enter a valid game id.");
+                } catch (DeploymentException e) {
+                    throw new RuntimeException(e);
                 }
             } else if (input[0].equals("logout")) {
                 System.out.println(facade.logout());
@@ -192,9 +199,33 @@ public class UIREPL implements GameHandler {
                 }
                 System.out.print("\u001b[39;49m"); // Set text back to default
             } else if (input[0].equals("leave")) {
-                System.out.println("leaving");
+                wsFacade.leaveGame(facade.getAuthToken(), gameID);
+                this.postLogin();
             } else if (input[0].equals("move")) {
-                System.out.println("moving");
+                if (input.length < 5) {
+                    System.out.println("Invalid syntax; Please enter in format move <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN>");
+                } else {
+                    try {
+                        ChessPosition startingPosition = new ChessPosition(letterToNumberConversion(input[1]), letterToNumberConversion(input[2]));
+                        ChessPosition endingPosition = new ChessPosition(letterToNumberConversion(input[3]), letterToNumberConversion(input[4]));
+                        ChessPiece.PieceType promotionPiece = null;
+                        if (input.length > 5) {
+                            String promotion = input[5];
+                            promotion = promotion.toLowerCase();
+                            switch (promotion) {
+                                case "knight" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+                                case "queen" -> promotionPiece = ChessPiece.PieceType.QUEEN;
+                                case "bishop" -> promotionPiece = ChessPiece.PieceType.BISHOP;
+                                case "rook" -> promotionPiece = ChessPiece.PieceType.ROOK;
+                            }
+                        }
+
+                        ChessMove move = new ChessMove(startingPosition, endingPosition, promotionPiece);
+                        wsFacade.makeMove(facade.getAuthToken(), gameID, move);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter valid coordinates");
+                    }
+                }
             } else if (input[0].equals("resign")) {
                 System.out.println("resigning");
             } else if (input[0].equals("show_moves")) {
@@ -202,10 +233,44 @@ public class UIREPL implements GameHandler {
             } else { // Default case called with "help" or any other input
                 System.out.println("\tredraw - Redraw the chess board");
                 System.out.println("\tleave - Leave the game");
-                System.out.println("\tmove <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN> - Move the piece from a starting position to a different position");
+                System.out.println("\tmove <START_ROW> <START_COLUMN> <END_ROW> <END_COLUMN> <PROMOTION_PIECE> - " +
+                        "Move the piece from a starting position to a different position (only include promotion " +
+                        "piece if a pawn is going to be promoted)");
                 System.out.println("\tresign - Forfeit and end the game");
                 System.out.println("\tshow_moves <ROW> <COLUMN> - Show the legal moves for a piece at a given position");
                 System.out.println("\thelp - View possible commands");
+            }
+        }
+    }
+
+    private int letterToNumberConversion(String input) throws NumberFormatException {
+        switch (input) {
+            case "a" -> {
+                return 1;
+            }
+            case "b" -> {
+                return 2;
+            }
+            case "c" -> {
+                return 3;
+            }
+            case "d" -> {
+                return 4;
+            }
+            case "e" -> {
+                return 5;
+            }
+            case "f" -> {
+                return 6;
+            }
+            case "g" -> {
+                return 7;
+            }
+            case "h" -> {
+                return 8;
+            }
+            default -> {
+                return Integer.parseInt(input);
             }
         }
     }
