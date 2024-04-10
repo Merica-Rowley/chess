@@ -1,6 +1,8 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccess.DBGameDAO;
 import dataAccess.Exceptions.DataAccessException;
@@ -18,6 +20,7 @@ import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.userCommands.*;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -51,9 +54,9 @@ public class WebSocketHandler {
         switch (command.getCommandType()) {
             case JOIN_PLAYER -> this.joinPlayer(session, message);
             case JOIN_OBSERVER -> this.joinObserver(session, message);
-            case MAKE_MOVE -> this.makeMove(message);
-            case LEAVE -> this.leave(message);
-            case RESIGN -> this.resign(message);
+            case MAKE_MOVE -> this.makeMove(session, message);
+            case LEAVE -> this.leave(session, message);
+            case RESIGN -> this.resign(session, message);
         }
     }
 
@@ -82,13 +85,13 @@ public class WebSocketHandler {
             }
 
             String sendThis = gson.toJson(new LoadGame(currentGameData.game()));
-            this.sendMessage(session, command.getGameID(), sendThis, command.getAuthString());
+            this.sendMessage(session, sendThis);
             String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as " + command.getPlayerColor() + "\n")));
-            broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
+            this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
 
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
-            this.sendMessage(session, command.getGameID(), errorObjectString, command.getAuthString());
+            this.sendMessage(session, errorObjectString);
         }
     }
 
@@ -107,28 +110,79 @@ public class WebSocketHandler {
             String userName = this.getUsername(command.getGameID(), command.getAuthString());
 
             String sendThis = gson.toJson(new LoadGame(currentGameData.game()));
-            this.sendMessage(session, command.getGameID(), sendThis, command.getAuthString());
+            this.sendMessage(session, sendThis);
             String broadcastThis = gson.toJson(new Notification(format(userName + " joined the game as an observer\n")));
             broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
-            this.sendMessage(session, command.getGameID(), errorObjectString, command.getAuthString());
+            this.sendMessage(session, errorObjectString);
         }
     }
 
-    private void makeMove(String message) {
+    private void makeMove(Session session, String message) {
         Gson gson = new Gson();
-        UserGameCommand command = gson.fromJson(message, MakeMove.class);
+        MakeMove command = gson.fromJson(message, MakeMove.class);
+        try {
+            GameData currentGameData = gameDAO.getGameData(command.getGameID());
+            if (currentGameData == null) {
+                throw new NoGameFoundException("Error: No game found");
+            }
+
+            int gameID = currentGameData.gameID();
+            ChessGame game = currentGameData.game();
+
+            if (game.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    game.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                    game.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                    game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                throw new DataAccessException("Error: Game Over");
+            }
+
+            String username = this.getUsername(gameID, command.getAuthString());
+            ChessGame.TeamColor userTeamColor = this.getTeamColor(gameID, username);
+
+            if (userTeamColor != game.getTeamTurn()) {
+                throw new DataAccessException("Error: Not your turn");
+            }
+
+            ChessMove move = command.getMove();
+
+            game.makeMove(move);
+
+            gameDAO.updateGame(gameID, game);
+
+            String sendGameLoad = gson.toJson(new LoadGame(currentGameData.game()));
+            this.sendMessage(session, sendGameLoad);
+            String broadcastThis = gson.toJson(new Notification(format(username + " made a move from " +
+                    move.getStartPosition() + " to " + move.getEndPosition() + "\n")));
+            this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
+            this.broadcastMessage(command.getGameID(), sendGameLoad, command.getAuthString());
+        } catch (DataAccessException  | InvalidMoveException e) {
+            String errorObjectString = gson.toJson(new Error(e.getMessage()));
+            this.sendMessage(session, errorObjectString);
+        }
     }
 
-    private void leave(String message) {
+    private void leave(Session session, String message) {
         Gson gson = new Gson();
-        UserGameCommand command = gson.fromJson(message, Leave.class);
+        Leave command = gson.fromJson(message, Leave.class);
+        try {
+            throw new DataAccessException("not implemented");
+        } catch (DataAccessException e) {
+            String errorObjectString = gson.toJson(new Error(e.getMessage()));
+            this.sendMessage(session, errorObjectString);
+        }
     }
 
-    private void resign(String message) {
+    private void resign(Session session, String message) {
         Gson gson = new Gson();
-        UserGameCommand command = gson.fromJson(message, Resign.class);
+        Resign command = gson.fromJson(message, Resign.class);
+        try {
+            throw new DataAccessException("not implemented");
+        } catch (DataAccessException e) {
+            String errorObjectString = gson.toJson(new Error(e.getMessage()));
+            this.sendMessage(session, errorObjectString);
+        }
     }
 
     private String getUsername(int gameID, String authToken) {
@@ -144,7 +198,17 @@ public class WebSocketHandler {
         return userName;
     }
 
-    private void sendMessage(Session session, int gameID, String message, String authToken) {
+    private ChessGame.TeamColor getTeamColor(int gameID, String username) throws DataAccessException {
+        if (Objects.equals(username, gameDAO.getGameData(gameID).whiteUsername())) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(username, gameDAO.getGameData(gameID).blackUsername())) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            return null;
+        }
+    }
+
+    private void sendMessage(Session session, String message) {
         try {
             assert session != null;
             session.getRemote().sendString(message);
