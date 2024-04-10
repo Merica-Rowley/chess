@@ -159,8 +159,8 @@ public class WebSocketHandler {
             this.sendMessage(session, sendGameLoad);
             String broadcastThis = gson.toJson(new Notification(format(username + " made a move from " +
                     move.getStartPosition() + " to " + move.getEndPosition() + "\n")));
-            this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
             this.broadcastMessage(command.getGameID(), sendGameLoad, command.getAuthString());
+            this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException  | InvalidMoveException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
             this.sendMessage(session, errorObjectString);
