@@ -72,7 +72,7 @@ public class DBGameDAO implements GameDAO {
     public void setWhiteUsername(int gameID, String whiteUsername) throws DataAccessException {
         configureDatabase();
         if (this.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
-        if (this.getGameData(gameID).whiteUsername() != null) throw new TeamTakenException("Error: white is already taken");
+        if (whiteUsername != null && this.getGameData(gameID).whiteUsername() != null) throw new TeamTakenException("Error: white is already taken");
         var statement = "UPDATE GameData SET whiteUsername=? WHERE gameID=?";
         executeUpdate(statement, whiteUsername, gameID);
     }
@@ -80,7 +80,7 @@ public class DBGameDAO implements GameDAO {
     public void setBlackUsername(int gameID, String blackUsername) throws DataAccessException {
         configureDatabase();
         if (this.getGameData(gameID) == null) throw new NoGameFoundException("Error: No game found with gameID");
-        if (this.getGameData(gameID).blackUsername() != null) throw new TeamTakenException("Error: black is already taken");
+        if (blackUsername != null && this.getGameData(gameID).blackUsername() != null) throw new TeamTakenException("Error: black is already taken");
         var statement = "UPDATE GameData SET blackUsername=? WHERE gameID=?";
         executeUpdate(statement, blackUsername, gameID);
     }

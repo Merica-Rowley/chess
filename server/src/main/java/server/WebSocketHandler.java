@@ -167,10 +167,30 @@ public class WebSocketHandler {
         Gson gson = new Gson();
         Leave command = gson.fromJson(message, Leave.class);
         try {
-            throw new DataAccessException("not implemented");
+            GameData currentGameData = gameDAO.getGameData(command.getGameID());
+
+            if (currentGameData == null) {
+                throw new NoGameFoundException("Error: No game found");
+            }
+
+            int gameID = currentGameData.gameID();
+            String userName = this.getUsername(command.getGameID(), command.getAuthString());
+            ChessGame.TeamColor teamColor = this.getTeamColor(gameID, userName);
+
+            if (teamColor == ChessGame.TeamColor.BLACK) {
+                gameDAO.setBlackUsername(gameID, null);
+            } else if (teamColor == ChessGame.TeamColor.WHITE) {
+                gameDAO.setWhiteUsername(gameID, null);
+            }
+
+            sessions.removeSessionFromGame(gameID, command.getAuthString(), session);
+            String broadcastThis = gson.toJson(new Notification(format(userName + " left the game\n")));
+            this.broadcastMessage(command.getGameID(), broadcastThis, command.getAuthString());
         } catch (DataAccessException e) {
             String errorObjectString = gson.toJson(new Error(e.getMessage()));
             this.sendMessage(session, errorObjectString);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
